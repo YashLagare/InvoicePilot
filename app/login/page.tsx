@@ -38,7 +38,7 @@ const LoginPage = async () => {
                   type="email"
                   placeholder="hello@gmail.com" />
               </div>
-              <SubmitButton/>
+              <SubmitButton text="Login"/>
             </form>
           </CardContent>
           <CardFooter>
