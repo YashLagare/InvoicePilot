@@ -8,4 +8,6 @@ export async function requireUser() {
     if (!session?.user) {
         return redirect("/")
     }
+
+    return session;
 }

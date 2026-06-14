@@ -1,10 +1,20 @@
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { buttonVariants } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { signIn } from "../utils/auth"
+import { ArrowLeft } from "lucide-react"
+import Link from "next/link"
+import { redirect } from "next/navigation"
+import SubmitButton from "../components/SubmitButton"
+import { auth, signIn } from "../utils/auth"
 
-const LoginPage = () => {
+const LoginPage = async () => {
+  const session = await auth();
+
+  if(session?.user){
+    redirect("/dashboard")
+  }
+
   return (
     <>
       <div className="flex h-screen w-full items-center justify-center px-4">
@@ -28,9 +38,17 @@ const LoginPage = () => {
                   type="email"
                   placeholder="hello@gmail.com" />
               </div>
-              <Button>Submit</Button>
+              <SubmitButton/>
             </form>
           </CardContent>
+          <CardFooter>
+            <Link href="/" className={buttonVariants({
+              className: "w-full",
+              variant: "outline",
+            })}>
+              <ArrowLeft className="size-4 mr-2" />Back to Homepage
+            </Link>
+          </CardFooter>
         </Card>
       </div>
     </>
