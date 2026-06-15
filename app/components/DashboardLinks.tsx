@@ -16,7 +16,7 @@ export const dashboardLinks = [
     {
         id: 1,
         name: "Invoices",
-        href: "/invoices",
+        href: "/dashboard/invoices",
         icon: ReceiptText,
     },
 ]

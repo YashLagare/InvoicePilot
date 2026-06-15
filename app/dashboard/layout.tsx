@@ -1,17 +1,39 @@
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import prisma from "@/lib/db";
 import Logo from "@/public/logo (2).png";
 import { MenuIcon, UserIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { ReactNode } from "react";
 import DashboardLinks from "../components/DashboardLinks";
 import { signOut } from "../utils/auth";
 import { requireUser } from "../utils/hooks";
 
+async function getUser(userId: string) {
+    const data = await prisma.user.findUnique({
+        where: {
+            id: userId,
+        },
+        select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            address: true,
+        },
+    });
+
+    if (!data?.firstName || !data?.lastName || !data?.address) {
+        redirect("/onboarding");
+    }
+    return data;
+}
+
 const DashboardLayout = async ({ children }: { children: ReactNode }) => {
     const session = await requireUser();
+    const data = await getUser(session.user?.id as string);
     return (
         <>
             <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
