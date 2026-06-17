@@ -5,9 +5,9 @@ import { formatCurrency } from "../utils/formatCurrency";
 import { requireUser } from "../utils/hooks";
 import InvoiceActions from "./InvoiceActions";
 
-async function getData(userId: string){
+async function getData(userId: string) {
     const data = await prisma.invoice.findMany({
-        where:{
+        where: {
             userId: userId,
         },
         select: {
@@ -20,13 +20,13 @@ async function getData(userId: string){
             currency: true,
         },
         orderBy: {
-            createdAt:'desc'
+            createdAt: 'desc'
         }
     });
     return data;
 }
 
-export async function InvoiceList(userId: string){
+export async function InvoiceList(userId: string) {
     const session = await requireUser();
     const data = await getData(session.user?.id as string);
 
@@ -59,7 +59,7 @@ export async function InvoiceList(userId: string){
                             </TableCell>
                             <TableCell>{new Date(invoice.createdAt).toLocaleDateString()}</TableCell>
                             <TableCell className="text-right">
-                                <InvoiceActions />
+                                <InvoiceActions id={invoice.id} />
                             </TableCell>
                         </TableRow>
                     ))

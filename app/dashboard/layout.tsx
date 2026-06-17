@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Toaster } from "@/components/ui/sonner";
 import prisma from "@/lib/db";
 import Logo from "@/public/logo (2).png";
 import { MenuIcon, UserIcon } from "lucide-react";
@@ -104,6 +105,7 @@ const DashboardLayout = async ({ children }: { children: ReactNode }) => {
                     </main>
                 </div>
             </div>
+            <Toaster richColors closeButton theme="light"/>
         </>
     )
 }
