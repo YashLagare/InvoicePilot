@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import prisma from "@/lib/db";
 import { formatCurrency } from "../utils/formatCurrency";
 import { requireUser } from "../utils/hooks";
+import { EmptyState } from "./EmptyState";
 
 async function getData(userId: string) {
     const data = await prisma.invoice.findMany({
@@ -33,27 +34,37 @@ const RecentInvoices = async () => {
             <CardHeader>
                 <CardTitle>Recent Invoices</CardTitle>
             </CardHeader>
+
             <CardContent className="flex flex-col gap-8">
-                {data.map((item) => (
-                    <div key={item.id} className="flex items-center gap-4">
-                        <Avatar className="hidden sm:flex size-9">
-                            <AvatarFallback>{item.clientName.slice(0, 2).toUpperCase()}</AvatarFallback>
-                        </Avatar>
-                        <div className="flex flex-col gap-1">
-                            <p className="text-sm font-medium leadin-none">{item.clientName}</p>
-                            <p className="text-sm text-muted-foreground">{item.clientEmail}</p>
+                {data.length === 0 ? (
+                    <EmptyState 
+                        title="No recent invoices" 
+                        description="You don't have any invoices yet. Create one to see it here." 
+                        buttonText="Create Invoice" 
+                        href="/dashboard/invoices/create" 
+                    />
+                ) : (
+                    data.map((item) => (
+                        <div key={item.id} className="flex items-center gap-4">
+                            <Avatar className="hidden sm:flex size-9">
+                                <AvatarFallback>{item.clientName.slice(0, 2).toUpperCase()}</AvatarFallback>
+                            </Avatar>
+                            <div className="flex flex-col gap-1">
+                                <p className="text-sm font-medium leadin-none">{item.clientName}</p>
+                                <p className="text-sm text-muted-foreground">{item.clientEmail}</p>
+                            </div>
+                            <div className="ml-auto font-medium">
+                                +
+                                {
+                                    formatCurrency({
+                                        amount: item.total,
+                                        currency: item.currency as any,
+                                    })
+                                }
+                            </div>
                         </div>
-                        <div className="ml-auto font-medium">
-                            +
-                            {
-                                formatCurrency({
-                                    amount: item.total,
-                                    currency: item.currency as any,
-                                })
-                            }
-                        </div>
-                    </div>
-                ))}
+                    ))
+                )}
             </CardContent>
         </Card>
     )

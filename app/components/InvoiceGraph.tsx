@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import prisma from "@/lib/db";
 import { requireUser } from "../utils/hooks";
+import { EmptyState } from "./EmptyState";
 import Graph from "./Graph";
 
 async function getInvoices(userId: string) {
@@ -58,7 +59,16 @@ const InvoiceGraph = async () => {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <Graph data={data} />
+                {data.length === 0 ? (
+                    <EmptyState 
+                        title="No invoices found" 
+                        description="You don't have any paid invoices in the last 30 days." 
+                        buttonText="Create Invoice" 
+                        href="/dashboard/invoices/create" 
+                    />
+                ) : (
+                    <Graph data={data} />
+                )}
             </CardContent>
         </Card>
     )
