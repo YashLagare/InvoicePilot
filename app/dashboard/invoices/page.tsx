@@ -4,7 +4,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { PlusIcon } from "lucide-react"
 import Link from "next/link"
 
-const InvoicesRoute = () => {
+type SearchParams = Promise<{ page?: string }>;
+
+const InvoicesRoute = async ({ searchParams }: { searchParams: SearchParams }) => {
+  const params = await searchParams;
+  const page = Number(params.page) || 1;
+
   return (
     <Card>
       <CardHeader>
@@ -19,7 +24,7 @@ const InvoicesRoute = () => {
         </div>
       </CardHeader>
       <CardContent>
-        <InvoiceList/>
+        <InvoiceList page={page} />
       </CardContent>
     </Card>
   )

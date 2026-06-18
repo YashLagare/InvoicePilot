@@ -165,3 +165,20 @@ export async function DeleteInvoice(invoiceId: string) {
     });
     return redirect("/dashboard/invoices");
 }
+
+//mark as paid invoice
+export async function MarkAsPaidInvoice(invoiceId: string) {
+    const session = await requireUser();
+
+    const data = await prisma.invoice.update({
+        where: {
+            id: invoiceId,
+            userId: session.user?.id,
+        },
+        data: {
+            status: "PAID",
+        }
+    });
+
+    return redirect("/dashboard/invoices");
+}

@@ -4,12 +4,15 @@ import prisma from "@/lib/db";
 import { formatCurrency } from "../utils/formatCurrency";
 import { requireUser } from "../utils/hooks";
 import InvoiceActions from "./InvoiceActions";
+import PaginationComponent from "./PaginationComponent";
 
-async function getData(userId: string) {
-    const data = await prisma.invoice.findMany({
-        where: {
-            userId: userId,
-        },
+async function getData(userId: string, page: number) {
+    const pageSize = 10;
+    const [data, totalCount] = await Promise.all([
+        prisma.invoice.findMany({
+            where: {
+                userId: userId,
+            },
         select: {
             id: true,
             clientName: true,
@@ -19,18 +22,26 @@ async function getData(userId: string) {
             invoiceNumber: true,
             currency: true,
         },
-        orderBy: {
-            createdAt: 'desc'
-        }
-    });
-    return data;
+            orderBy: {
+                createdAt: 'desc'
+            },
+            skip: (page - 1) * pageSize,
+            take: pageSize,
+        }),
+        prisma.invoice.count({
+            where: { userId: userId }
+        })
+    ]);
+
+    return { data, totalPages: Math.ceil(totalCount / pageSize) };
 }
 
-export async function InvoiceList(userId: string) {
+export async function InvoiceList({ page }: { page: number }) {
     const session = await requireUser();
-    const data = await getData(session.user?.id as string);
+    const { data, totalPages } = await getData(session.user?.id as string, page);
 
     return (
+        <>
         <Table>
             <TableHeader>
                 <TableRow>
@@ -59,13 +70,15 @@ export async function InvoiceList(userId: string) {
                             </TableCell>
                             <TableCell>{new Date(invoice.createdAt).toLocaleDateString()}</TableCell>
                             <TableCell className="text-right">
-                                <InvoiceActions id={invoice.id} />
+                                <InvoiceActions status={invoice.status} id={invoice.id} />
                             </TableCell>
                         </TableRow>
                     ))
                 }
             </TableBody>
         </Table>
+        <PaginationComponent totalPages={totalPages} />
+        </>
     )
 }
 

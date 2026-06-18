@@ -8,9 +8,10 @@ import { toast } from "sonner";
 
 interface invoiceActionProps {
     id: string;
+    status: string;
 }
 
-const InvoiceActions = ({ id }: invoiceActionProps) => {
+const InvoiceActions = ({ id, status }: invoiceActionProps) => {
     const handleSendReminder = async () => {
         toast.promise(fetch(`/api/email/${id}`, {
             method: "POST",
@@ -34,21 +35,29 @@ const InvoiceActions = ({ id }: invoiceActionProps) => {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-                <DropdownMenuItem asChild>
-                    <Link href={`/dashboard/invoices/${id}`}><PencilIcon className="size-4 mr-2" />Edit Invoice</Link>
-                </DropdownMenuItem>
+                {status !== "PAID" && (
+                    <DropdownMenuItem asChild>
+                        <Link href={`/dashboard/invoices/${id}`}><PencilIcon className="size-4 mr-2" />Edit Invoice</Link>
+                    </DropdownMenuItem>
+                )}
                 <DropdownMenuItem asChild>
                     <Link href={`/api/invoice/${id}`} target="_blank"><DownloadCloudIcon className="size-4 mr-2" />Download Invoice</Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleSendReminder}>
-                    <MailIcon className="size-4 mr-2" />Reminder Email
-                </DropdownMenuItem>
+                {status !== "PAID" && (
+                    <DropdownMenuItem onClick={handleSendReminder}>
+                        <MailIcon className="size-4 mr-2" />Reminder Email
+                    </DropdownMenuItem>
+                )}
                 <DropdownMenuItem asChild>
                     <Link href={`/dashboard/invoices/${id}/delete`}><Trash2 className="size-4 mr-2" />Delete Invoice</Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                    <Link href=""><CheckCircle2 className="size-4 mr-2" />Mark as paid</Link>
-                </DropdownMenuItem>
+
+                {status !== "PAID" && (
+                    <DropdownMenuItem asChild>
+                        <Link href={`/dashboard/invoices/${id}/paid`}><CheckCircle2 className="size-4 mr-2" />Mark as paid</Link>
+                    </DropdownMenuItem>
+                )}
+
             </DropdownMenuContent>
         </DropdownMenu>
     )
