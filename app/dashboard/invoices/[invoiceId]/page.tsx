@@ -9,6 +9,9 @@ async function getData(invoiceId: string, userId: string) {
             id: invoiceId,
             userId: userId,
         },
+        include: {
+            items: true
+        }
     });
 
     if (!data) {

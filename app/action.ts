@@ -56,9 +56,13 @@ export async function createInvoice(prevState: any, formData: FormData) {
             fromAddress: submission.value.fromAddress,
             fromEmail: submission.value.fromEmail,
             fromName: submission.value.fromName,
-            invoiceItemDescription: submission.value.invoiceItemDescription,
-            invoiceItemQuantity: submission.value.invoiceItemQuantity,
-            invoiceItemRate: submission.value.invoiceItemRate,
+            items: {
+                create: submission.value.items.map((item) => ({
+                    description: item.description,
+                    quantity: item.quantity,
+                    rate: item.rate,
+                })),
+            },
             invoiceName: submission.value.invoiceName,
             invoiceNumber: submission.value.invoiceNumber,
             status: submission.value.status,
@@ -72,23 +76,27 @@ export async function createInvoice(prevState: any, formData: FormData) {
     dueDate.setDate(dueDate.getDate() + Number(submission.value.dueDate));
 
     //send email after creation 
-    await emailClient.sendMail({
-        from: process.env.EMAIL_FROM || 'InvoicePilot <hello@demomailtrap.com>',
-        to: submission.value.clientEmail,
-        subject: "New Invoice from InvoicePilot",
-        html: generateEmailTemplate({
-            clientName: submission.value.clientName,
-            invoiceNumber: submission.value.invoiceNumber.toString(),
-            fromName: submission.value.fromName,
-            currency: submission.value.currency,
-            total: new Intl.NumberFormat("en-US", {
-                style: "currency",
+    try {
+        await emailClient.sendMail({
+            from: process.env.EMAIL_FROM || 'InvoicePilot <hello@demomailtrap.com>',
+            to: submission.value.clientEmail,
+            subject: "New Invoice from InvoicePilot",
+            html: generateEmailTemplate({
+                clientName: submission.value.clientName,
+                invoiceNumber: submission.value.invoiceNumber.toString(),
+                fromName: submission.value.fromName,
                 currency: submission.value.currency,
-            }).format(submission.value.total),
-            dueDate: Number(submission.value.dueDate) === 0 ? "Due on Receipt" : `Net ${submission.value.dueDate}`,
-            invoiceLink: `http://localhost:3000/api/invoice/${data.id}`
-        })
-    });
+                total: new Intl.NumberFormat("en-US", {
+                    style: "currency",
+                    currency: submission.value.currency,
+                }).format(submission.value.total),
+                dueDate: Number(submission.value.dueDate) === 0 ? "Due on Receipt" : `Net ${submission.value.dueDate}`,
+                invoiceLink: `http://localhost:3000/api/invoice/${data.id}`
+            })
+        });
+    } catch (error) {
+        console.error("Failed to send email. Error:", error);
+    }
 
     return redirect("/dashboard/invoices");
 }
@@ -120,9 +128,14 @@ export async function editInvoice(prevState: any, formData: FormData) {
             fromAddress: submission.value.fromAddress,
             fromEmail: submission.value.fromEmail,
             fromName: submission.value.fromName,
-            invoiceItemDescription: submission.value.invoiceItemDescription,
-            invoiceItemQuantity: submission.value.invoiceItemQuantity,
-            invoiceItemRate: submission.value.invoiceItemRate,
+            items: {
+                deleteMany: {},
+                create: submission.value.items.map((item) => ({
+                    description: item.description,
+                    quantity: item.quantity,
+                    rate: item.rate,
+                })),
+            },
             invoiceName: submission.value.invoiceName,
             invoiceNumber: submission.value.invoiceNumber,
             status: submission.value.status,
@@ -133,23 +146,27 @@ export async function editInvoice(prevState: any, formData: FormData) {
 
     const sender = process.env.EMAIL_FROM || 'InvoicePilot <hello@demomailtrap.com>';
 
-    await emailClient.sendMail({
-        from: sender,
-        to: submission.value.clientEmail,
-        subject: "Invoice Updated - InvoicePilot",
-        html: generateInvoiceUpdatedEmailTemplate({
-            clientName: submission.value.clientName,
-            invoiceNumber: submission.value.invoiceNumber.toString(),
-            fromName: submission.value.fromName,
-            currency: submission.value.currency,
-            total: new Intl.NumberFormat("en-US", {
-                style: "currency",
+    try {
+        await emailClient.sendMail({
+            from: sender,
+            to: submission.value.clientEmail,
+            subject: "Invoice Updated - InvoicePilot",
+            html: generateInvoiceUpdatedEmailTemplate({
+                clientName: submission.value.clientName,
+                invoiceNumber: submission.value.invoiceNumber.toString(),
+                fromName: submission.value.fromName,
                 currency: submission.value.currency,
-            }).format(submission.value.total),
-            dueDate: Number(submission.value.dueDate) === 0 ? "Due on Receipt" : `Net ${submission.value.dueDate}`,
-            invoiceLink: `http://localhost:3000/api/invoice/${data.id}`
-        })
-    });
+                total: new Intl.NumberFormat("en-US", {
+                    style: "currency",
+                    currency: submission.value.currency,
+                }).format(submission.value.total),
+                dueDate: Number(submission.value.dueDate) === 0 ? "Due on Receipt" : `Net ${submission.value.dueDate}`,
+                invoiceLink: `http://localhost:3000/api/invoice/${data.id}`
+            })
+        });
+    } catch (error) {
+        console.error("Failed to send updated invoice email. Error:", error);
+    }
 
     return redirect("/dashboard/invoices");
 }

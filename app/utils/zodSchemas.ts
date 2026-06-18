@@ -29,8 +29,13 @@ export const invoiceSchema = z.object({
 
     note: z.string().optional(),
 
-    invoiceItemDescription: z.string().min(2, "Description is required"),
-    invoiceItemQuantity: z.number().min(1, "Quantity is required"),
-    invoiceItemRate: z.number().min(1, "Rate minimum 1 is required")
-
+    items: z.string().transform(str => JSON.parse(str)).pipe(
+        z.array(
+            z.object({
+                description: z.string().min(1, "Description is required"),
+                quantity: z.number().min(1, "Quantity must be at least 1"),
+                rate: z.number().min(0, "Rate must be 0 or greater"),
+            })
+        )
+    )
 })

@@ -1,5 +1,5 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import prisma from "@/lib/db";
+import { TrendingUp } from "lucide-react";
 import { requireUser } from "../utils/hooks";
 import { EmptyState } from "./EmptyState";
 import Graph from "./Graph";
@@ -8,70 +8,61 @@ async function getInvoices(userId: string) {
     const rawData = await prisma.invoice.findMany({
         where: {
             status: "PAID",
-            userId: userId,
+            userId,
             createdAt: {
                 lte: new Date(),
                 gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-            }
+            },
         },
-        select: {
-            createdAt: true,
-            total: true,
-        },
-        orderBy: {
-            createdAt: "asc",
-        }
+        select: { createdAt: true, total: true },
+        orderBy: { createdAt: "asc" },
     });
 
-    //group and aggregate data by date
-    const aggreGateData = rawData.reduce(
-        (acc: {[key: string]: number}, curr) => {
-            const date = new Date(curr.createdAt).toLocaleDateString("en-US",{
-                month: "short",
-                day: "numeric",
-            });
-            acc[date] = acc[date] || 0;
-            acc[date] += curr.total;
-            return acc;
-        },
-        {} as {[key: string]: number}
-    )
+    const aggregateData = rawData.reduce((acc: { [key: string]: number }, curr) => {
+        const date = new Date(curr.createdAt).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+        });
+        acc[date] = (acc[date] || 0) + curr.total;
+        return acc;
+    }, {});
 
-    // Convert to array and sort by date
-    return Object.entries(aggreGateData)
-        .map(([date, amount]) => ({
-            date,
-            amount,
-        }))
+    return Object.entries(aggregateData)
+        .map(([date, amount]) => ({ date, amount }))
         .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 }
 
 const InvoiceGraph = async () => {
     const session = await requireUser();
     const data = await getInvoices(session.user?.id as string);
-    console.log(data);
+
     return (
-        <Card className="lg:col-span-2">
-            <CardHeader>
-                <CardTitle>Paid Invoices</CardTitle>
-                <CardDescription>
-                    Invoices which have been paid in the last 30 days
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
+        <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-slate-100">
+                <div>
+                    <h3 className="text-sm font-semibold text-slate-900">Revenue Overview</h3>
+                    <p className="text-xs text-slate-400 mt-0.5">Paid invoices in the last 30 days</p>
+                </div>
+                <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center">
+                    <TrendingUp className="w-4 h-4 text-blue-700" />
+                </div>
+            </div>
+
+            <div className="p-5">
                 {data.length === 0 ? (
-                    <EmptyState 
-                        title="No invoices found" 
-                        description="You don't have any paid invoices in the last 30 days." 
-                        buttonText="Create Invoice" 
-                        href="/dashboard/invoices/create" 
+                    <EmptyState
+                        title="No revenue data yet"
+                        description="You don't have any paid invoices in the last 30 days."
+                        buttonText="Create Invoice"
+                        href="/dashboard/invoices/create"
                     />
                 ) : (
                     <Graph data={data} />
                 )}
-            </CardContent>
-        </Card>
-    )
-}
+            </div>
+        </div>
+    );
+};
 
-export default InvoiceGraph
+export default InvoiceGraph;

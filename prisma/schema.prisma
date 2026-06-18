@@ -103,9 +103,7 @@ model Invoice {
   invoiceNumber Int
   note          String?
 
-  invoiceItemDescription String
-  invoiceItemQuantity    Int
-  invoiceItemRate        Int
+  items InvoiceItem[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -116,4 +114,13 @@ model Invoice {
 enum InvoiceStatus {
   PAID
   PENDING
+}
+
+model InvoiceItem {
+  id          String  @id @default(uuid())
+  description String
+  quantity    Int
+  rate        Int
+  invoiceId   String
+  invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
 }
