@@ -1,7 +1,12 @@
+import { DeleteInvoice } from "@/app/action";
+import SubmitButton from "@/app/components/SubmitButton";
 import { requireUser } from "@/app/utils/hooks";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { buttonVariants } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import prisma from "@/lib/db";
+import warnning from "@/public/warnning1.gif";
 import Image from "next/image";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 
@@ -32,7 +37,7 @@ export default async function DeleteInvoiceRoute({
 
     return (
         <div className="flex flex-1 justify-center items-center">
-            <Card className="max-w-[500px]">
+            <Card className="max-w-500px">
                 <CardHeader>
                     <CardTitle>Delete Invoice</CardTitle>
                     <CardDescription>
@@ -41,8 +46,19 @@ export default async function DeleteInvoiceRoute({
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <Image src="/invoice.png" alt="Invoice" width={200} height={200} />
+                    <Image src={warnning} alt="warning" className="rounded-lg" />
                 </CardContent>
+                <CardFooter className="flex items-center justify-between">
+                    <Link className={buttonVariants({ variant: "outline" })} href="/dashboard/invoices">
+                        Cancel
+                    </Link>
+                    <form action={async () => {
+                        "use server";
+                        await DeleteInvoice(invoiceId);
+                    }}>
+                        <SubmitButton variant="destructive" text="Delete Invoice" />
+                    </form>
+                </CardFooter>
             </Card>
         </div>
     )

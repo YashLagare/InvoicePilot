@@ -132,7 +132,7 @@ export async function editInvoice(prevState: any, formData: FormData) {
     });
 
     const sender = process.env.EMAIL_FROM || 'InvoicePilot <hello@demomailtrap.com>';
-    
+
     await emailClient.sendMail({
         from: sender,
         to: submission.value.clientEmail,
@@ -151,5 +151,17 @@ export async function editInvoice(prevState: any, formData: FormData) {
         })
     });
 
+    return redirect("/dashboard/invoices");
+}
+
+//delete invoice
+export async function DeleteInvoice(invoiceId: string) {
+    const session = await requireUser();
+    const data = await prisma.invoice.delete({
+        where: {
+            id: invoiceId,
+            userId: session.user?.id,
+        },
+    });
     return redirect("/dashboard/invoices");
 }
