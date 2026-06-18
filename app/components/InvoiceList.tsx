@@ -6,11 +6,18 @@ import { requireUser } from "../utils/hooks";
 import InvoiceActions from "./InvoiceActions";
 import PaginationComponent from "./PaginationComponent";
 
-async function getData(userId: string, page: number) {
+async function getData(userId: string, page: number, status: string) {
     const pageSize = 10;
+    
+    // Construct the where clause dynamically based on the status filter
+    const whereClause: any = { userId };
+    if (status && status !== "ALL") {
+        whereClause.status = status;
+    }
+
     const [data, totalCount] = await Promise.all([
         prisma.invoice.findMany({
-            where: { userId },
+            where: whereClause,
             select: {
                 id: true,
                 clientName: true,
@@ -24,7 +31,7 @@ async function getData(userId: string, page: number) {
             skip: (page - 1) * pageSize,
             take: pageSize,
         }),
-        prisma.invoice.count({ where: { userId } }),
+        prisma.invoice.count({ where: whereClause }),
     ]);
 
     return { data, totalPages: Math.ceil(totalCount / pageSize) };
@@ -58,9 +65,9 @@ function StatusBadge({ status }: { status: string }) {
     );
 }
 
-export async function InvoiceList({ page }: { page: number }) {
+export async function InvoiceList({ page, status = "ALL" }: { page: number; status?: string }) {
     const session = await requireUser();
-    const { data, totalPages } = await getData(session.user?.id as string, page);
+    const { data, totalPages } = await getData(session.user?.id as string, page, status);
 
     if (data.length === 0) {
         return (
@@ -68,8 +75,12 @@ export async function InvoiceList({ page }: { page: number }) {
                 <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center mb-4">
                     <FileText className="w-7 h-7 text-blue-600" />
                 </div>
-                <p className="text-slate-800 font-medium text-base mb-1">No invoices yet</p>
-                <p className="text-slate-400 text-sm">Create your first invoice to get started.</p>
+                <p className="text-slate-800 font-medium text-base mb-1">
+                    {status !== "ALL" ? `No ${status.toLowerCase()} invoices found` : "No invoices yet"}
+                </p>
+                <p className="text-slate-400 text-sm">
+                    {status !== "ALL" ? "Try changing your status filter." : "Create your first invoice to get started."}
+                </p>
             </div>
         );
     }
