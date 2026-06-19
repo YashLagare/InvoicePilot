@@ -39,9 +39,9 @@ async function getData(userId: string, page: number, status: string) {
 
 function StatusBadge({ status }: { status: string }) {
     const styles: Record<string, string> = {
-        PAID: "bg-emerald-50 text-emerald-700 border-emerald-200",
-        PENDING: "bg-amber-50 text-amber-700 border-amber-200",
-        OVERDUE: "bg-red-50 text-red-700 border-red-200",
+        PAID: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/50 dark:text-emerald-400 dark:border-emerald-800",
+        PENDING: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/50 dark:text-amber-400 dark:border-amber-800",
+        OVERDUE: "bg-red-50 text-red-700 border-red-200 dark:bg-red-900/50 dark:text-red-400 dark:border-red-800",
     };
 
     const dots: Record<string, string> = {
@@ -54,7 +54,7 @@ function StatusBadge({ status }: { status: string }) {
 
     return (
         <span
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${styles[key] ?? "bg-slate-50 text-slate-600 border-slate-200"
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${styles[key] ?? "bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700"
                 }`}
         >
             <span
@@ -72,13 +72,13 @@ export async function InvoiceList({ page, status = "ALL" }: { page: number; stat
     if (data.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
-                <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center mb-4">
-                    <FileText className="w-7 h-7 text-blue-600" />
+                <div className="w-14 h-14 rounded-2xl bg-blue-50 dark:bg-blue-900/50 flex items-center justify-center mb-4">
+                    <FileText className="w-7 h-7 text-blue-600 dark:text-blue-400" />
                 </div>
-                <p className="text-slate-800 font-medium text-base mb-1">
+                <p className="text-slate-800 dark:text-slate-100 font-medium text-base mb-1">
                     {status !== "ALL" ? `No ${status.toLowerCase()} invoices found` : "No invoices yet"}
                 </p>
-                <p className="text-slate-400 text-sm">
+                <p className="text-slate-400 dark:text-slate-500 text-sm">
                     {status !== "ALL" ? "Try changing your status filter." : "Create your first invoice to get started."}
                 </p>
             </div>
@@ -92,7 +92,7 @@ export async function InvoiceList({ page, status = "ALL" }: { page: number; stat
             <div className="hidden sm:block overflow-x-auto">
                 <Table>
                     <TableHeader>
-                        <TableRow className="bg-slate-50 hover:bg-slate-50 border-b border-slate-200">
+                        <TableRow className="bg-slate-50 hover:bg-slate-50 dark:bg-slate-900/50 dark:hover:bg-slate-900/50 border-b border-slate-200 dark:border-slate-800">
                             <TableHead className="text-xs font-semibold text-slate-500 uppercase tracking-wide pl-5">Invoice</TableHead>
                             <TableHead className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Customer</TableHead>
                             <TableHead className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Amount</TableHead>
@@ -105,25 +105,25 @@ export async function InvoiceList({ page, status = "ALL" }: { page: number; stat
                         {data.map((invoice) => (
                             <TableRow
                                 key={invoice.id}
-                                className="border-b border-slate-100 hover:bg-slate-50/60 transition-colors"
+                                className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50/60 dark:hover:bg-slate-800/50 transition-colors"
                             >
                                 <TableCell className="pl-5 py-4">
-                                    <span className="text-sm font-semibold text-blue-700">
+                                    <span className="text-sm font-semibold text-blue-700 dark:text-blue-400">
                                         #{invoice.invoiceNumber}
                                     </span>
                                 </TableCell>
                                 <TableCell className="py-4">
                                     <div className="flex items-center gap-2.5">
-                                        <div className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0">
-                                            <span className="text-xs font-semibold text-slate-600">
+                                        <div className="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center flex-shrink-0">
+                                            <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">
                                                 {invoice.clientName?.charAt(0).toUpperCase()}
                                             </span>
                                         </div>
-                                        <span className="text-sm font-medium text-slate-800">{invoice.clientName}</span>
+                                        <span className="text-sm font-medium text-slate-800 dark:text-slate-100">{invoice.clientName}</span>
                                     </div>
                                 </TableCell>
                                 <TableCell className="py-4">
-                                    <span className="text-sm font-semibold text-slate-900">
+                                    <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                                         {formatCurrency({ amount: invoice.total, currency: invoice.currency as any })}
                                     </span>
                                 </TableCell>
@@ -149,11 +149,11 @@ export async function InvoiceList({ page, status = "ALL" }: { page: number; stat
             </div>
 
             {/* Mobile Cards */}
-            <div className="sm:hidden flex flex-col divide-y divide-slate-100">
+            <div className="sm:hidden flex flex-col divide-y divide-slate-100 dark:divide-slate-800">
                 {data.map((invoice) => (
                     <div key={invoice.id} className="px-4 py-4 flex flex-col gap-3">
                         <div className="flex items-center justify-between">
-                            <span className="text-sm font-semibold text-blue-700">
+                            <span className="text-sm font-semibold text-blue-700 dark:text-blue-400">
                                 #{invoice.invoiceNumber}
                             </span>
                             <StatusBadge status={invoice.status} />

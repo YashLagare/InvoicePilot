@@ -53,7 +53,7 @@ export function InvoiceItemList({
   );
 
   const inputClass =
-    "h-10 bg-slate-50 border-slate-200 rounded-xl text-sm placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-0 focus-visible:border-blue-600 focus-visible:bg-white transition-all";
+    "h-10 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-slate-100 rounded-xl text-sm placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-0 focus-visible:border-blue-600 focus-visible:bg-white dark:focus-visible:bg-slate-900 transition-all";
 
   return (
     <>
@@ -86,7 +86,7 @@ export function InvoiceItemList({
                   updateItem(item.id, "description", e.target.value)
                 }
                 placeholder="Item name & description"
-                className="bg-slate-50 border-slate-200 rounded-xl text-sm placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-0 focus-visible:border-blue-600 focus-visible:bg-white transition-all resize-none"
+                className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-slate-100 rounded-xl text-sm placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-0 focus-visible:border-blue-600 focus-visible:bg-white dark:focus-visible:bg-slate-900 transition-all resize-none"
                 rows={2}
               />
             </div>
@@ -131,7 +131,7 @@ export function InvoiceItemList({
                   currency: currency as any,
                 })}
                 disabled
-                className="h-10 bg-slate-100 border-slate-200 rounded-xl text-sm font-semibold text-slate-700 cursor-not-allowed"
+                className="h-10 bg-slate-100 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-300 cursor-not-allowed"
               />
             </div>
 
@@ -141,7 +141,7 @@ export function InvoiceItemList({
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="text-red-500 hover:bg-red-50 hover:text-red-600 rounded-lg sm:opacity-0 sm:group-hover:opacity-100 transition-all"
+                  className="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/50 hover:text-red-600 dark:hover:text-red-400 rounded-lg sm:opacity-0 sm:group-hover:opacity-100 transition-all"
                   onClick={() => removeItem(item.id)}
                 >
                   <Trash2 className="w-4 h-4" />
@@ -157,7 +157,7 @@ export function InvoiceItemList({
           type="button"
           variant="secondary"
           onClick={addItem}
-          className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-none rounded-xl text-sm font-medium h-10 px-4"
+          className="bg-blue-50 dark:bg-slate-800 text-blue-700 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-slate-700 border-none rounded-xl text-sm font-medium h-10 px-4"
         >
           <Plus className="w-4 h-4 mr-2" />
           Add Item
@@ -165,20 +165,20 @@ export function InvoiceItemList({
       </div>
 
       {/* Total summary */}
-      <div className="mt-6 border-t border-slate-100 pt-4">
+      <div className="mt-6 border-t border-slate-100 dark:border-slate-800 pt-4">
         <div className="flex justify-end">
           <div className="w-full sm:w-64 flex flex-col gap-1">
             <div className="flex items-center justify-between py-1 text-sm">
-              <span className="text-slate-500">Subtotal</span>
-              <span className="font-medium text-slate-700">
+              <span className="text-slate-500 dark:text-slate-400">Subtotal</span>
+              <span className="font-medium text-slate-700 dark:text-slate-300">
                 {formatCurrency({
                   amount: calculateTotal,
                   currency: currency as any,
                 })}
               </span>
             </div>
-            <div className="flex items-center justify-between py-2 border-t border-slate-100 mt-1">
-              <span className="text-base font-semibold text-slate-900">
+            <div className="flex items-center justify-between py-2 border-t border-slate-100 dark:border-slate-800 mt-1">
+              <span className="text-base font-semibold text-slate-900 dark:text-slate-100">
                 Total
               </span>
               <span className="text-lg font-bold text-blue-600">

@@ -25,12 +25,12 @@ const Onboarding = () => {
     });
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center bg-slate-100 p-4 sm:p-8">
+        <div className="min-h-screen w-full flex items-center justify-center bg-slate-100 dark:bg-slate-950 p-4 sm:p-8">
 
-            <Card className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 overflow-hidden shadow-2xl border-0 rounded-2xl">
+            <Card className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 overflow-hidden shadow-2xl border-0 rounded-2xl dark:bg-slate-900">
 
                 {/* ── Left: Brand Panel ── */}
-                <div className="relative bg-blue-700 p-8 sm:p-10 flex flex-col justify-between overflow-hidden">
+                <div className="relative bg-blue-700 dark:bg-blue-900 p-8 sm:p-10 flex flex-col justify-between overflow-hidden">
 
                     {/* Subtle blobs */}
                     <div className="absolute -bottom-16 -left-16 w-64 h-64 rounded-full bg-white/5" />
@@ -81,15 +81,15 @@ const Onboarding = () => {
                 </div>
 
                 {/* ── Right: Form Panel ── */}
-                <div className="bg-white p-8 sm:p-10 flex flex-col justify-center">
+                <div className="bg-white dark:bg-slate-900 p-8 sm:p-10 flex flex-col justify-center">
 
                     {/* Header */}
                     <div className="mb-8">
-                        <span className="inline-flex items-center gap-1.5 bg-blue-50 text-blue-700 text-xs font-semibold px-2.5 py-1 rounded-full tracking-wide uppercase mb-3">
+                        <span className="inline-flex items-center gap-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-semibold px-2.5 py-1 rounded-full tracking-wide uppercase mb-3">
                             Step 1 of 1 · Personal details
                         </span>
-                        <h1 className="text-slate-900 text-2xl font-semibold tracking-tight mb-1.5">Almost there!</h1>
-                        <p className="text-slate-500 text-sm leading-relaxed">
+                        <h1 className="text-slate-900 dark:text-white text-2xl font-semibold tracking-tight mb-1.5">Almost there!</h1>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
                             Enter your details below to finish creating your account.
                         </p>
                     </div>
@@ -105,13 +105,13 @@ const Onboarding = () => {
                         {/* First + Last Name */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="flex flex-col gap-1.5">
-                                <Label className="text-slate-700 text-sm font-medium">
+                                <Label className="text-slate-700 dark:text-slate-300 text-sm font-medium">
                                     First name <span className="text-red-500">*</span>
                                 </Label>
                                 <Input
-                                    className="h-11 bg-slate-50 border-slate-200 rounded-xl text-sm placeholder:text-slate-400
+                                    className="h-11 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-slate-100 rounded-xl text-sm placeholder:text-slate-400
                                                focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-0
-                                               focus-visible:border-blue-600 focus-visible:bg-white transition-all"
+                                               focus-visible:border-blue-600 focus-visible:bg-white dark:focus-visible:bg-slate-900 transition-all"
                                     name={fields.firstName.name}
                                     key={fields.firstName.key}
                                     defaultValue={fields.firstName.initialValue}
@@ -124,13 +124,13 @@ const Onboarding = () => {
                             </div>
 
                             <div className="flex flex-col gap-1.5">
-                                <Label className="text-slate-700 text-sm font-medium">
+                                <Label className="text-slate-700 dark:text-slate-300 text-sm font-medium">
                                     Last name <span className="text-red-500">*</span>
                                 </Label>
                                 <Input
-                                    className="h-11 bg-slate-50 border-slate-200 rounded-xl text-sm placeholder:text-slate-400
+                                    className="h-11 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-slate-100 rounded-xl text-sm placeholder:text-slate-400
                                                focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-0
-                                               focus-visible:border-blue-600 focus-visible:bg-white transition-all"
+                                               focus-visible:border-blue-600 focus-visible:bg-white dark:focus-visible:bg-slate-900 transition-all"
                                     name={fields.lastName.name}
                                     key={fields.lastName.key}
                                     defaultValue={fields.lastName.initialValue}
@@ -145,13 +145,13 @@ const Onboarding = () => {
 
                         {/* Address */}
                         <div className="flex flex-col gap-1.5">
-                            <Label className="text-slate-700 text-sm font-medium">
+                            <Label className="text-slate-700 dark:text-slate-300 text-sm font-medium">
                                 Business address <span className="text-red-500">*</span>
                             </Label>
                             <Input
-                                className="h-11 bg-slate-50 border-slate-200 rounded-xl text-sm placeholder:text-slate-400
+                                className="h-11 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-slate-100 rounded-xl text-sm placeholder:text-slate-400
                                            focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-0
-                                           focus-visible:border-blue-600 focus-visible:bg-white transition-all"
+                                           focus-visible:border-blue-600 focus-visible:bg-white dark:focus-visible:bg-slate-900 transition-all"
                                 name={fields.address.name}
                                 key={fields.address.key}
                                 defaultValue={fields.address.initialValue}
@@ -164,9 +164,9 @@ const Onboarding = () => {
                         </div>
 
                         {/* Trust note */}
-                        <div className="flex items-start gap-2.5 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3">
-                            <ShieldCheck className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
-                            <p className="text-blue-700 text-xs leading-relaxed">
+                        <div className="flex items-start gap-2.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/50 rounded-xl px-4 py-3">
+                            <ShieldCheck className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                            <p className="text-blue-700 dark:text-blue-300 text-xs leading-relaxed">
                                 Your information is encrypted and never shared with third parties.
                             </p>
                         </div>

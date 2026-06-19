@@ -3,15 +3,14 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Toaster } from "@/components/ui/sonner";
 import prisma from "@/lib/db";
-import Logo from "@/public/logo (2).png";
 import { FileText, LogOut, MenuIcon, UserIcon } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
 import DashboardLinks from "../components/DashboardLinks";
 import { signOut } from "../utils/auth";
 import { requireUser } from "../utils/hooks";
+import { ModeToggle } from "../components/ModeToggle";
 
 async function getUser(userId: string) {
     const data = await prisma.user.findUnique({
@@ -36,15 +35,17 @@ const DashboardLayout = async ({ children }: { children: ReactNode }) => {
 
     return (
         <>
-            <div className="grid min-h-screen w-full md:grid-cols-[240px_1fr] lg:grid-cols-[260px_1fr] bg-slate-50">
+            <div className="grid min-h-screen w-full md:grid-cols-[240px_1fr] lg:grid-cols-[260px_1fr] bg-slate-50 dark:bg-slate-950">
 
                 {/* ── Sidebar ── */}
-                <aside className="hidden md:flex flex-col border-r border-slate-200 bg-white">
+                <aside className="hidden md:flex flex-col border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 h-screen">
 
                     {/* Logo */}
-                    <div className="h-16 flex items-center justify-center border-b border-slate-100">
+                    <div className="h-16 flex items-center justify-center border-b border-slate-100 dark:border-slate-800">
                         <Link href="/" className="flex items-center gap-2.5">
-                            <Image src={Logo} alt="InvoicePilot" className="h-10 w-auto" />
+                            <span className="text-2xl font-bold text-slate-900 dark:text-white">
+                                Invoice<span className="text-blue-600">Pilot</span>
+                            </span>
                         </Link>
                     </div>
 
@@ -57,13 +58,13 @@ const DashboardLayout = async ({ children }: { children: ReactNode }) => {
                     </nav>
 
                     {/* User footer */}
-                    <div className="border-t border-slate-100 p-4">
-                        <div className="flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-slate-50 transition-colors">
-                            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                                <UserIcon className="w-4 h-4 text-blue-700" />
+                    <div className="border-t border-slate-100 dark:border-slate-800 p-4">
+                        <div className="flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                            <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center flex-shrink-0">
+                                <UserIcon className="w-4 h-4 text-blue-700 dark:text-blue-400" />
                             </div>
                             <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-slate-800 truncate">
+                                <p className="text-sm font-medium text-slate-800 dark:text-slate-100 truncate">
                                     {data.firstName} {data.lastName}
                                 </p>
                                 <p className="text-xs text-slate-400 truncate">Account</p>
@@ -76,7 +77,7 @@ const DashboardLayout = async ({ children }: { children: ReactNode }) => {
                 <div className="flex flex-col min-h-screen">
 
                     {/* Header */}
-                    <header className="h-16 flex items-center gap-4 border-b border-slate-200 bg-white px-4 lg:px-6 sticky top-0 z-30">
+                    <header className="h-16 flex items-center gap-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 lg:px-6 sticky top-0 z-30">
 
                         {/* Mobile menu */}
                         <Sheet>
@@ -84,15 +85,17 @@ const DashboardLayout = async ({ children }: { children: ReactNode }) => {
                                 <Button
                                     variant="outline"
                                     size="icon"
-                                    className="shrink-0 md:hidden border-slate-200 rounded-xl"
+                                    className="shrink-0 md:hidden border-slate-200 dark:border-slate-800 rounded-xl"
                                 >
                                     <MenuIcon className="size-4" />
                                 </Button>
                             </SheetTrigger>
-                            <SheetContent side="left" className="w-64 p-0 bg-white">
-                                <div className="h-16 flex items-center justify-center border-b border-slate-100">
+                            <SheetContent side="left" className="w-64 p-0 bg-white dark:bg-slate-900">
+                                <div className="h-16 flex items-center justify-center border-b border-slate-100 dark:border-slate-800">
                                     <Link href="/" className="flex items-center gap-2.5">
-                                        <Image src={Logo} alt="InvoicePilot" className="h-10 w-auto" />
+                                        <span className="text-2xl font-bold text-slate-900 dark:text-white">
+                                            Invoice<span className="text-blue-600">Pilot</span>
+                                        </span>
                                     </Link>
                                 </div>
                                 <nav className="px-3 py-4">
@@ -106,62 +109,65 @@ const DashboardLayout = async ({ children }: { children: ReactNode }) => {
 
                         {/* Page brand on mobile */}
                         <div className="flex items-center gap-2 md:hidden">
-                            <span className="text-sm font-semibold text-slate-800">InvoicePilot</span>
+                            <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">InvoicePilot</span>
                         </div>
 
-                        <div className="flex items-center gap-3 ml-auto">
+                        <div className="flex items-center gap-5 ml-auto">
+                            <ModeToggle />
+                            
+                            <div className="flex items-center gap-3">
+                                {/* User name — desktop only */}
+                                <span className="hidden sm:block text-sm text-slate-500 dark:text-slate-400 font-medium">
+                                    {data.firstName} {data.lastName}
+                                </span>
 
-                            {/* User name — desktop only */}
-                            <span className="hidden sm:block text-sm text-slate-500 font-medium">
-                                {data.firstName} {data.lastName}
-                            </span>
-
-                            {/* User dropdown */}
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button
-                                        variant="outline"
-                                        size="icon"
-                                        className="rounded-full border-slate-200 w-9 h-9 bg-blue-50 hover:bg-blue-100 transition-colors"
-                                    >
-                                        <UserIcon className="size-4 text-blue-700" />
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-52 rounded-xl shadow-lg border-slate-200">
-                                    <DropdownMenuLabel className="font-normal px-3 py-2">
-                                        <p className="text-sm font-semibold text-slate-800">
-                                            {data.firstName} {data.lastName}
-                                        </p>
-                                        <p className="text-xs text-slate-400 mt-0.5">My Account</p>
-                                    </DropdownMenuLabel>
-                                    <DropdownMenuSeparator className="bg-slate-100" />
-                                    <DropdownMenuItem asChild>
-                                        <Link href="/dashboard" className="cursor-pointer text-sm text-slate-700">
-                                            Dashboard
-                                        </Link>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem asChild>
-                                        <Link href="/dashboard/invoices" className="cursor-pointer text-sm text-slate-700">
-                                            Invoices
-                                        </Link>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuSeparator className="bg-slate-100" />
-                                    <form
-                                        className="w-full"
-                                        action={async () => {
-                                            "use server";
-                                            await signOut({ redirectTo: "/login" });
-                                        }}
-                                    >
+                                {/* User dropdown */}
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button
+                                            variant="outline"
+                                            size="icon"
+                                            className="rounded-full border-slate-200 dark:border-slate-700 w-9 h-9 bg-blue-50 hover:bg-blue-100 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors"
+                                        >
+                                            <UserIcon className="size-4 text-blue-700 dark:text-blue-400" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end" className="w-52 rounded-xl shadow-lg border-slate-200 dark:border-slate-800 dark:bg-slate-900">
+                                        <DropdownMenuLabel className="font-normal px-3 py-2">
+                                            <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                                                {data.firstName} {data.lastName}
+                                            </p>
+                                            <p className="text-xs text-slate-400 mt-0.5">My Account</p>
+                                        </DropdownMenuLabel>
+                                        <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800" />
                                         <DropdownMenuItem asChild>
-                                            <button className="w-full text-left flex items-center gap-2 text-sm text-red-500 cursor-pointer">
-                                                <LogOut className="w-3.5 h-3.5" />
-                                                Logout
-                                            </button>
+                                            <Link href="/dashboard" className="cursor-pointer text-sm text-slate-700 dark:text-slate-300">
+                                                Dashboard
+                                            </Link>
                                         </DropdownMenuItem>
-                                    </form>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                                        <DropdownMenuItem asChild>
+                                            <Link href="/dashboard/invoices" className="cursor-pointer text-sm text-slate-700 dark:text-slate-300">
+                                                Invoices
+                                            </Link>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800" />
+                                        <form
+                                            className="w-full"
+                                            action={async () => {
+                                                "use server";
+                                                await signOut({ redirectTo: "/login" });
+                                            }}
+                                        >
+                                            <DropdownMenuItem asChild>
+                                                <button className="w-full text-left flex items-center gap-2 text-sm text-red-500 cursor-pointer">
+                                                    <LogOut className="w-3.5 h-3.5" />
+                                                    Logout
+                                                </button>
+                                            </DropdownMenuItem>
+                                        </form>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
                         </div>
                     </header>
 
@@ -172,7 +178,7 @@ const DashboardLayout = async ({ children }: { children: ReactNode }) => {
                 </div>
             </div>
 
-            <Toaster richColors closeButton theme="light" />
+            <Toaster richColors closeButton theme="system" />
         </>
     );
 };

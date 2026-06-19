@@ -75,12 +75,12 @@ const LoginPage = async () => {
   }
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-slate-100 p-4 sm:p-8">
+    <div className="min-h-screen w-full flex items-center justify-center bg-slate-100 dark:bg-slate-950 p-4 sm:p-8">
 
       <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 overflow-hidden rounded-2xl shadow-2xl">
 
         {/* ── Left: Brand Panel ── */}
-        <div className="relative bg-blue-700 p-8 sm:p-10 flex flex-col justify-between overflow-hidden">
+        <div className="relative bg-blue-700 dark:bg-blue-900 p-8 sm:p-10 flex flex-col justify-between overflow-hidden">
 
           <div className="absolute -bottom-16 -left-16 w-64 h-64 rounded-full bg-white/5" />
           <div className="absolute -top-12 -right-12 w-52 h-52 rounded-full bg-white/5" />
@@ -133,16 +133,16 @@ const LoginPage = async () => {
         </div>
 
         {/* ── Right: Login Form ── */}
-        <div className="bg-white p-8 sm:p-10 flex flex-col justify-center">
+        <div className="bg-white dark:bg-slate-900 p-8 sm:p-10 flex flex-col justify-center">
 
           <div className="mb-8">
-            <span className="inline-flex items-center gap-1.5 bg-blue-50 text-blue-700 text-xs font-semibold px-2.5 py-1 rounded-full tracking-wide uppercase mb-3">
+            <span className="inline-flex items-center gap-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-semibold px-2.5 py-1 rounded-full tracking-wide uppercase mb-3">
               Sign in
             </span>
-            <h1 className="text-slate-900 text-2xl font-semibold tracking-tight mb-1.5">
+            <h1 className="text-slate-900 dark:text-white text-2xl font-semibold tracking-tight mb-1.5">
               Login to your account
             </h1>
-            <p className="text-slate-500 text-sm leading-relaxed">
+            <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
               Enter your email and we'll send you a magic link to sign in instantly.
             </p>
           </div>
@@ -155,7 +155,7 @@ const LoginPage = async () => {
             className="flex flex-col gap-5"
           >
             <div className="flex flex-col gap-1.5">
-              <Label className="text-slate-700 text-sm font-medium">
+              <Label className="text-slate-700 dark:text-slate-300 text-sm font-medium">
                 Email address <span className="text-red-500">*</span>
               </Label>
               <div className="relative">
@@ -165,16 +165,16 @@ const LoginPage = async () => {
                   required
                   type="email"
                   placeholder="hello@example.com"
-                  className="h-11 pl-9 bg-slate-50 border-slate-200 rounded-xl text-sm placeholder:text-slate-400
+                  className="h-11 pl-9 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-slate-100 rounded-xl text-sm placeholder:text-slate-400
                              focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-0
-                             focus-visible:border-blue-600 focus-visible:bg-white transition-all"
+                             focus-visible:border-blue-600 focus-visible:bg-white dark:focus-visible:bg-slate-900 transition-all"
                 />
               </div>
             </div>
 
-            <div className="flex items-start gap-2.5 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3">
-              <ShieldCheck className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
-              <p className="text-blue-700 text-xs leading-relaxed">
+            <div className="flex items-start gap-2.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/50 rounded-xl px-4 py-3">
+              <ShieldCheck className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+              <p className="text-blue-700 dark:text-blue-300 text-xs leading-relaxed">
                 We'll email you a secure magic link — no password required.
               </p>
             </div>
@@ -187,7 +187,7 @@ const LoginPage = async () => {
               href="/"
               className={buttonVariants({
                 variant: "outline",
-                className: "w-full h-11 rounded-xl border-slate-200 text-slate-600 text-sm hover:bg-slate-50 transition-all",
+                className: "w-full h-11 rounded-xl border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 dark:hover:bg-slate-800 text-sm hover:bg-slate-50 transition-all",
               })}
             >
               <ArrowLeft className="w-4 h-4 mr-2" />

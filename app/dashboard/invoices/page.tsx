@@ -21,8 +21,8 @@ const InvoicesRoute = async ({ searchParams }: { searchParams: SearchParams }) =
             <FileText className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-semibold text-slate-900 leading-none mb-1">Invoices</h1>
-            <p className="text-sm text-slate-500">Manage and track all your invoices</p>
+            <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100 leading-none mb-1">Invoices</h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Manage and track all your invoices</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -30,7 +30,7 @@ const InvoicesRoute = async ({ searchParams }: { searchParams: SearchParams }) =
           <Link
             href="/dashboard/invoices/create"
             className={buttonVariants({
-              className: "h-10 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-sm font-medium px-4 gap-2 shadow-sm shadow-blue-200 transition-all",
+              className: "h-10 rounded-xl !bg-blue-600 hover:!bg-blue-700 !text-white text-sm font-medium px-4 gap-2 shadow-sm shadow-blue-200 dark:shadow-none transition-all",
             })}
           >
             <PlusIcon className="w-4 h-4" />
@@ -40,7 +40,7 @@ const InvoicesRoute = async ({ searchParams }: { searchParams: SearchParams }) =
       </div>
 
       {/* Table Card */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
         <InvoiceList page={page} status={status} />
       </div>
 

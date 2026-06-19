@@ -55,11 +55,11 @@ function SectionHeader({
         <Icon className="w-4 h-4 text-blue-700" />
       </div>
       <div>
-        <p className="text-sm font-semibold text-slate-800 leading-none">
+        <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 leading-none">
           {title}
         </p>
         {subtitle && (
-          <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>
+          <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{subtitle}</p>
         )}
       </div>
     </div>
@@ -105,9 +105,9 @@ const CreateInvoice = ({
   );
 
   const inputClass =
-    "h-10 bg-slate-50 border-slate-200 rounded-xl text-sm placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-0 focus-visible:border-blue-600 focus-visible:bg-white transition-all";
+    "h-10 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-slate-100 rounded-xl text-sm placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-0 focus-visible:border-blue-600 focus-visible:bg-white dark:focus-visible:bg-slate-900 transition-all";
 
-  const labelClass = "text-slate-700 text-sm font-medium mb-1.5 block";
+  const labelClass = "text-slate-700 dark:text-slate-300 text-sm font-medium mb-1.5 block";
 
   return (
     <form id={form.id} action={action} onSubmit={form.onSubmit} noValidate>
@@ -121,7 +121,7 @@ const CreateInvoice = ({
       <input type="hidden" name="items" value={JSON.stringify(items)} />
 
       {/* ── Invoice Meta ── */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-5">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 mb-5">
         <SectionHeader
           icon={FileText}
           title="Invoice Details"
@@ -135,7 +135,7 @@ const CreateInvoice = ({
               Invoice Name <span className="text-red-500">*</span>
             </Label>
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-100 text-slate-500 text-xs font-semibold border border-slate-200 h-10 flex-shrink-0">
+              <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs font-semibold border border-slate-200 dark:border-slate-700 h-10 flex-shrink-0">
                 Draft
               </span>
               <Input
@@ -155,7 +155,7 @@ const CreateInvoice = ({
               Invoice No. <span className="text-red-500">*</span>
             </Label>
             <div className="flex">
-              <span className="h-10 px-3 flex items-center border border-r-0 border-slate-200 rounded-l-xl bg-slate-100 text-slate-500 text-sm font-medium">
+              <span className="h-10 px-3 flex items-center border border-r-0 border-slate-200 dark:border-slate-800 rounded-l-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-sm font-medium">
                 #
               </span>
               <Input
@@ -180,7 +180,7 @@ const CreateInvoice = ({
               key={fields.currency.key}
               onValueChange={(value) => setCurrency(value)}
             >
-              <SelectTrigger className="h-10 bg-slate-50 border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-600 focus:ring-offset-0">
+              <SelectTrigger className="h-10 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-slate-100 rounded-xl text-sm focus:ring-2 focus:ring-blue-600 focus:ring-offset-0">
                 <SelectValue placeholder="Select Currency" />
               </SelectTrigger>
               <SelectContent>
@@ -197,7 +197,7 @@ const CreateInvoice = ({
       </div>
 
       {/* ── From / To ── */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-5">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 mb-5 relative">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* From */}
           <div>
@@ -246,7 +246,7 @@ const CreateInvoice = ({
           </div>
 
           {/* Divider — vertical on md, horizontal on mobile */}
-          <div className="hidden md:block absolute left-1/2 top-6 bottom-6 w-px bg-slate-100 pointer-events-none" />
+          <div className="hidden md:block absolute left-1/2 top-6 bottom-6 w-px bg-slate-100 dark:bg-slate-800 pointer-events-none" />
 
           {/* To */}
           <div>
@@ -301,7 +301,7 @@ const CreateInvoice = ({
       </div>
 
       {/* ── Date & Due ── */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-5">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 mb-5">
         <SectionHeader
           icon={CalendarIcon}
           title="Dates"
@@ -317,7 +317,7 @@ const CreateInvoice = ({
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-full h-10 justify-start text-left font-normal bg-slate-50 border-slate-200 rounded-xl text-sm hover:bg-white hover:border-blue-600 transition-all"
+                  className="w-full h-10 justify-start text-left font-normal bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-slate-100 rounded-xl text-sm hover:bg-white dark:hover:bg-slate-900 hover:border-blue-600 transition-all"
                 >
                   <CalendarIcon className="w-4 h-4 mr-2 text-slate-400" />
                   {selectedDate
@@ -327,7 +327,7 @@ const CreateInvoice = ({
                     : "Pick a date"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 rounded-xl shadow-lg border-slate-200">
+              <PopoverContent className="w-auto p-0 rounded-xl shadow-lg border-slate-200 dark:border-slate-800 dark:bg-slate-900">
                 <Calendar
                   mode="single"
                   selected={selectedDate}
@@ -349,7 +349,7 @@ const CreateInvoice = ({
               key={fields.dueDate.key}
               defaultValue={fields.dueDate.defaultValue}
             >
-              <SelectTrigger className="h-10 bg-slate-50 border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-600 focus:ring-offset-0">
+              <SelectTrigger className="h-10 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-slate-100 rounded-xl text-sm focus:ring-2 focus:ring-blue-600 focus:ring-offset-0">
                 <SelectValue placeholder="Select payment terms" />
               </SelectTrigger>
               <SelectContent>
@@ -364,7 +364,7 @@ const CreateInvoice = ({
       </div>
 
       {/* ── Line Items ── */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-5">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 mb-5">
         <SectionHeader
           icon={FileText}
           title="Line Items"
@@ -378,7 +378,7 @@ const CreateInvoice = ({
       </div>
 
       {/* ── Note ── */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-6">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 mb-6">
         <SectionHeader
           icon={StickyNote}
           title="Note"
@@ -389,7 +389,7 @@ const CreateInvoice = ({
           key={fields.note.key}
           defaultValue={fields.note.defaultValue}
           placeholder="Add a note or payment instructions for your client..."
-          className="bg-slate-50 border-slate-200 rounded-xl text-sm placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-0 focus-visible:border-blue-600 focus-visible:bg-white transition-all resize-none"
+          className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-slate-100 rounded-xl text-sm placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-0 focus-visible:border-blue-600 focus-visible:bg-white dark:focus-visible:bg-slate-900 transition-all resize-none"
           rows={3}
         />
       </div>

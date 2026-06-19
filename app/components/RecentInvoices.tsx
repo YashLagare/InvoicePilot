@@ -24,19 +24,19 @@ const RecentInvoices = async () => {
     const data = await getData(session.user?.id as string);
 
     return (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
             {/* Header */}
-            <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-slate-100">
+            <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-slate-100 dark:border-slate-800">
                 <div>
-                    <h3 className="text-sm font-semibold text-slate-900">Recent Invoices</h3>
-                    <p className="text-xs text-slate-400 mt-0.5">Latest 6 invoices</p>
+                    <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Recent Invoices</h3>
+                    <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">Latest 6 invoices</p>
                 </div>
-                <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center">
-                    <Clock className="w-4 h-4 text-blue-700" />
+                <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-900/50 flex items-center justify-center">
+                    <Clock className="w-4 h-4 text-blue-700 dark:text-blue-400" />
                 </div>
             </div>
 
-            <div className="flex flex-col divide-y divide-slate-100">
+            <div className="flex flex-col divide-y divide-slate-100 dark:divide-slate-800">
                 {data.length === 0 ? (
                     <div className="p-5">
                         <EmptyState
@@ -48,24 +48,24 @@ const RecentInvoices = async () => {
                     </div>
                 ) : (
                     data.map((item) => (
-                        <div key={item.id} className="flex items-center gap-3 px-5 py-3.5 hover:bg-slate-50/60 transition-colors">
+                        <div key={item.id} className="flex items-center gap-3 px-5 py-3.5 hover:bg-slate-50/60 dark:hover:bg-slate-800/50 transition-colors">
                             {/* Avatar */}
-                            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                                <span className="text-xs font-semibold text-blue-700">
+                            <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center flex-shrink-0">
+                                <span className="text-xs font-semibold text-blue-700 dark:text-blue-400">
                                     {item.clientName.slice(0, 2).toUpperCase()}
                                 </span>
                             </div>
 
                             {/* Name + email */}
                             <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-slate-800 truncate leading-none mb-0.5">
+                                <p className="text-sm font-medium text-slate-800 dark:text-slate-100 truncate leading-none mb-0.5">
                                     {item.clientName}
                                 </p>
-                                <p className="text-xs text-slate-400 truncate">{item.clientEmail}</p>
+                                <p className="text-xs text-slate-400 dark:text-slate-500 truncate">{item.clientEmail}</p>
                             </div>
 
                             {/* Amount */}
-                            <span className="text-sm font-semibold text-emerald-600 flex-shrink-0">
+                            <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-500 flex-shrink-0">
                                 +{formatCurrency({ amount: item.total, currency: item.currency as any })}
                             </span>
                         </div>

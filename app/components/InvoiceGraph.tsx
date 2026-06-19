@@ -37,15 +37,15 @@ const InvoiceGraph = async () => {
     const data = await getInvoices(session.user?.id as string);
 
     return (
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
             {/* Header */}
-            <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-slate-100">
+            <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-slate-100 dark:border-slate-800">
                 <div>
-                    <h3 className="text-sm font-semibold text-slate-900">Revenue Overview</h3>
-                    <p className="text-xs text-slate-400 mt-0.5">Paid invoices in the last 30 days</p>
+                    <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Revenue Overview</h3>
+                    <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">Paid invoices in the last 30 days</p>
                 </div>
-                <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center">
-                    <TrendingUp className="w-4 h-4 text-blue-700" />
+                <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-900/50 flex items-center justify-center">
+                    <TrendingUp className="w-4 h-4 text-blue-700 dark:text-blue-400" />
                 </div>
             </div>
 

@@ -39,7 +39,7 @@ export default function StatusFilter() {
                 value={selectedStatus} 
                 onValueChange={setSelectedStatus}
             >
-                <SelectTrigger className="w-[160px] h-10 rounded-xl bg-white border border-slate-200">
+                <SelectTrigger className="w-[160px] h-10 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
                     <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -49,13 +49,13 @@ export default function StatusFilter() {
                 </SelectContent>
             </Select>
 
-            <Button onClick={handleSearch} variant="secondary" className="h-10 rounded-xl px-4 gap-2 text-blue-700 bg-blue-50 hover:bg-blue-100">
+            <Button onClick={handleSearch} variant="secondary" className="h-10 rounded-xl px-4 gap-2 text-blue-700 bg-blue-50 hover:bg-blue-100 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-blue-400 transition-colors">
                 <Search className="w-4 h-4" />
                 Search
             </Button>
 
             {currentStatus !== "ALL" && (
-                <Button onClick={handleClear} variant="ghost" className="h-10 rounded-xl px-4 gap-2 text-slate-500 hover:bg-slate-100">
+                <Button onClick={handleClear} variant="ghost" className="h-10 rounded-xl px-4 gap-2 text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 transition-colors">
                     <X className="w-4 h-4" />
                     Clear
                 </Button>

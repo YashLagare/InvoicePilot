@@ -47,12 +47,12 @@ import Link from 'next/link'
 
 const VerifyPage = () => {
     return (
-        <div className="min-h-screen w-full flex items-center justify-center bg-slate-100 p-4 sm:p-8">
+        <div className="min-h-screen w-full flex items-center justify-center bg-slate-100 dark:bg-slate-950 p-4 sm:p-8">
 
             <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 overflow-hidden rounded-2xl shadow-2xl">
 
                 {/* ── Left: Brand Panel ── */}
-                <div className="relative bg-blue-700 p-8 sm:p-10 flex flex-col justify-between overflow-hidden">
+                <div className="relative bg-blue-700 dark:bg-blue-900 p-8 sm:p-10 flex flex-col justify-between overflow-hidden">
 
                     <div className="absolute -bottom-16 -left-16 w-64 h-64 rounded-full bg-white/5" />
                     <div className="absolute -top-12 -right-12 w-52 h-52 rounded-full bg-white/5" />
@@ -105,33 +105,33 @@ const VerifyPage = () => {
                 </div>
 
                 {/* ── Right: Verify Panel ── */}
-                <div className="bg-white p-8 sm:p-10 flex flex-col justify-center">
+                <div className="bg-white dark:bg-slate-900 p-8 sm:p-10 flex flex-col justify-center">
 
                     <div className="mb-8">
-                        <span className="inline-flex items-center gap-1.5 bg-blue-50 text-blue-700 text-xs font-semibold px-2.5 py-1 rounded-full tracking-wide uppercase mb-3">
+                        <span className="inline-flex items-center gap-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-semibold px-2.5 py-1 rounded-full tracking-wide uppercase mb-3">
                             Verify email
                         </span>
-                        <h1 className="text-slate-900 text-2xl font-semibold tracking-tight mb-1.5">
+                        <h1 className="text-slate-900 dark:text-white text-2xl font-semibold tracking-tight mb-1.5">
                             Check your email
                         </h1>
-                        <p className="text-slate-500 text-sm leading-relaxed">
+                        <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
                             We sent a verification link to your email address. Click it to sign in.
                         </p>
                     </div>
 
                     {/* Mail icon */}
-                    <div className="flex flex-col items-center justify-center py-8 mb-6 bg-slate-50 rounded-2xl border border-slate-100">
-                        <div className="w-16 h-16 rounded-2xl bg-blue-100 flex items-center justify-center mb-4">
-                            <Mail className="w-8 h-8 text-blue-600" />
+                    <div className="flex flex-col items-center justify-center py-8 mb-6 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-800">
+                        <div className="w-16 h-16 rounded-2xl bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center mb-4">
+                            <Mail className="w-8 h-8 text-blue-600 dark:text-blue-400" />
                         </div>
-                        <p className="text-slate-700 text-sm font-medium">Magic link sent!</p>
-                        <p className="text-slate-400 text-xs mt-1">The link expires in 10 minutes</p>
+                        <p className="text-slate-700 dark:text-slate-300 text-sm font-medium">Magic link sent!</p>
+                        <p className="text-slate-400 dark:text-slate-500 text-xs mt-1">The link expires in 10 minutes</p>
                     </div>
 
                     {/* Spam warning */}
-                    <div className="flex items-start gap-2.5 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 mb-6">
-                        <AlertCircle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
-                        <p className="text-amber-700 text-xs leading-relaxed">
+                    <div className="flex items-start gap-2.5 bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-900/50 rounded-xl px-4 py-3 mb-6">
+                        <AlertCircle className="w-4 h-4 text-amber-500 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                        <p className="text-amber-700 dark:text-amber-300 text-xs leading-relaxed">
                             Can't find the email? Be sure to check your <span className="font-semibold">spam or junk</span> folder.
                         </p>
                     </div>
@@ -141,7 +141,7 @@ const VerifyPage = () => {
                         href="/"
                         className={buttonVariants({
                             variant: "outline",
-                            className: "w-full h-11 rounded-xl border-slate-200 text-slate-600 text-sm hover:bg-slate-50 transition-all",
+                            className: "w-full h-11 rounded-xl border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 dark:hover:bg-slate-800 text-sm hover:bg-slate-50 transition-all",
                         })}
                     >
                         <ArrowLeft className="w-4 h-4 mr-2" />
