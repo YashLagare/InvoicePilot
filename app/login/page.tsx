@@ -65,6 +65,7 @@ import { ArrowLeft, FileText, Mail, ShieldCheck, Zap } from "lucide-react"
 import Link from "next/link"
 import { redirect } from "next/navigation"
 import SubmitButton from "../components/SubmitButton"
+import { DemoNotice } from "../components/DemoNotice"
 import { auth, signIn } from "../utils/auth"
 
 const LoginPage = async () => {
@@ -181,6 +182,8 @@ const LoginPage = async () => {
 
             <SubmitButton text="Send magic link" />
           </form>
+
+          <DemoNotice />
 
           <div className="mt-4">
             <Link
