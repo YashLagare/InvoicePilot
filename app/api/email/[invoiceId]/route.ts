@@ -37,7 +37,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ inv
                     currency: invoiceData.currency,
                 }).format(invoiceData.total),
                 dueDate: Number(invoiceData.dueDate) === 0 ? "Due on Receipt" : `Net ${invoiceData.dueDate}`,
-                invoiceLink: `http://localhost:3000/api/invoice/${invoiceData.id}`
+                invoiceLink: `${process.env.NODE_ENV !== "production" ? "http://localhost:3000" : "https://invoice-pilot-pi.vercel.app"}/api/invoice/${invoiceData.id}`
             })
         });
 

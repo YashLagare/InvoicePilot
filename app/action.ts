@@ -91,7 +91,7 @@ export async function createInvoice(prevState: any, formData: FormData) {
                     currency: submission.value.currency,
                 }).format(submission.value.total),
                 dueDate: Number(submission.value.dueDate) === 0 ? "Due on Receipt" : `Net ${submission.value.dueDate}`,
-                invoiceLink: `http://localhost:3000/api/invoice/${data.id}`
+                invoiceLink: `${process.env.NODE_ENV !== "production" ? "http://localhost:3000" : "https://invoice-pilot-pi.vercel.app"}/api/invoice/${data.id}`
             })
         });
     } catch (error) {
@@ -161,7 +161,7 @@ export async function editInvoice(prevState: any, formData: FormData) {
                     currency: submission.value.currency,
                 }).format(submission.value.total),
                 dueDate: Number(submission.value.dueDate) === 0 ? "Due on Receipt" : `Net ${submission.value.dueDate}`,
-                invoiceLink: `http://localhost:3000/api/invoice/${data.id}`
+                invoiceLink: `${process.env.NODE_ENV !== "production" ? "http://localhost:3000" : "https://invoice-pilot-pi.vercel.app"}/api/invoice/${data.id}`
             })
         });
     } catch (error) {
