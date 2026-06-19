@@ -51,6 +51,7 @@
     "typescript": "^5"
   },
   "overrides": {
-    "@types/nodemailer": "$@types/nodemailer"
+    "@types/nodemailer": "$@types/nodemailer",
+    "nodemailer": "$nodemailer"
   }
 }
