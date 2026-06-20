@@ -27,7 +27,7 @@ Freelancers and SMBs often need a fast way to:
 
 Project Screenshot Placeholder:
 
-[INSERT_PROJECT_COVER_SCREENSHOT_HERE]
+<img width="1900" height="906" alt="image" src="https://github.com/user-attachments/assets/af5e510c-0950-4419-82c5-923fc53c09d7" />
 
 ---
 
@@ -127,10 +127,6 @@ A freelancer generates invoices with multiple line items, delivers them to clien
 
 ## Target Audience
 Freelancers and SMBs using invoicing workflows requiring PDF and email delivery.
-
-Project Screenshot Placeholder:
-
-[INSERT_PROJECT_OVERVIEW_SCREENSHOT_HERE]
 
 ---
 
@@ -253,8 +249,6 @@ Implemented via:
      - `app/components/PaginationComponent.tsx`
 
 Feature Screenshot Placeholder:
-
-[INSERT_FEATURE_SCREENSHOT_HERE]
 
 ---
 
