@@ -25,9 +25,8 @@ Freelancers and SMBs often need a fast way to:
 - Automated email delivery via Nodemailer transport
 - Dashboard overview (summary blocks, recent invoices, revenue chart for paid invoices)
 
-Project Screenshot Placeholder:
+<img width="1901" height="912" alt="Screenshot 2026-06-21 123607" src="https://github.com/user-attachments/assets/dc9bbacf-0e51-4cd5-bf72-debb74a57fb8" />
 
-<img width="1900" height="906" alt="image" src="https://github.com/user-attachments/assets/af5e510c-0950-4419-82c5-923fc53c09d7" />
 
 ---
 
