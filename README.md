@@ -1070,7 +1070,7 @@ HTTP response / redirect
 
 ## 24. SECURITY REVIEW
 
-### Existing Security Measures (from code)
+### Existing Security Measures
 - **Authentication gating**: `requireUser()` redirects unauthenticated users.
 - **Authorization by ownership** for invoice CRUD and reminders:
   - list uses `where: { userId }`
