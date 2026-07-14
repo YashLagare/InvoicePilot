@@ -23,6 +23,11 @@ export async function POST(request: Request, { params }: { params: Promise<{ inv
 
         const sender = process.env.EMAIL_FROM || 'InvoicePilot <hello@demomailtrap.com>';
 
+        const baseUrl =
+            process.env.NODE_ENV !== "production"
+                ? "http://localhost:3000"
+                : `https://${process.env.VERCEL_URL ?? process.env.NEXT_PUBLIC_BASE_URL ?? "invoice-pilot-gold.vercel.app"}`;
+
         await emailClient.sendMail({
             from: sender,
             to: invoiceData.clientEmail,
@@ -37,7 +42,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ inv
                     currency: invoiceData.currency,
                 }).format(invoiceData.total),
                 dueDate: Number(invoiceData.dueDate) === 0 ? "Due on Receipt" : `Net ${invoiceData.dueDate}`,
-                invoiceLink: `${process.env.NODE_ENV !== "production" ? "http://localhost:3000" : "https://invoice-pilot-pi.vercel.app"}/api/invoice/${invoiceData.id}`
+                invoiceLink: `${baseUrl}/api/invoice/${invoiceData.id}`
             })
         });
 
