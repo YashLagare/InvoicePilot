@@ -61,12 +61,45 @@
 import { buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { ArrowLeft, FileText, Mail, ShieldCheck, Zap } from "lucide-react"
+import { ArrowLeft, FileText, Lock, Mail, ShieldCheck, Zap } from "lucide-react"
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import SubmitButton from "../components/SubmitButton"
 import { DemoNotice } from "../components/DemoNotice"
+import { ModeToggle } from "../components/ModeToggle"
+import SubmitButton from "../components/SubmitButton"
 import { auth, signIn } from "../utils/auth"
+
+async function handleCredentialsLogin(formData: FormData) {
+  "use server"
+
+  const email = formData.get("email")?.toString().trim()
+  const password = formData.get("password")?.toString()
+
+  if (!email || !password) {
+    redirect("/login?error=missing-credentials")
+  }
+
+  const result = await signIn("credentials", { email, password, redirect: false })
+
+  if (result?.error) {
+    redirect("/login?error=invalid-credentials")
+  }
+
+  redirect("/dashboard")
+}
+
+async function handleMagicLinkLogin(formData: FormData) {
+  "use server"
+
+  const email = formData.get("email")?.toString().trim()
+
+  if (!email) {
+    redirect("/login?error=missing-email")
+  }
+
+  await signIn("nodemailer", { email, redirect: false })
+  redirect("/verify")
+}
 
 const LoginPage = async () => {
   const session = await auth();
@@ -136,52 +169,118 @@ const LoginPage = async () => {
         {/* ── Right: Login Form ── */}
         <div className="bg-white dark:bg-slate-900 p-8 sm:p-10 flex flex-col justify-center">
 
+          <div className="flex items-center justify-end mb-4">
+            <ModeToggle />
+          </div>
+
           <div className="mb-8">
             <span className="inline-flex items-center gap-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-semibold px-2.5 py-1 rounded-full tracking-wide uppercase mb-3">
               Sign in
             </span>
             <h1 className="text-slate-900 dark:text-white text-2xl font-semibold tracking-tight mb-1.5">
-              Login to your account
+              Choose a sign-in method
             </h1>
             <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
-              Enter your email and we'll send you a magic link to sign in instantly.
+              Use the password option for demos and shared access, or use a magic link if you prefer a passwordless experience.
             </p>
           </div>
 
-          <form
-            action={async (formData) => {
-              "use server";
-              await signIn("nodemailer", formData)
-            }}
-            className="flex flex-col gap-5"
-          >
-            <div className="flex flex-col gap-1.5">
-              <Label className="text-slate-700 dark:text-slate-300 text-sm font-medium">
-                Email address <span className="text-red-500">*</span>
-              </Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-                <Input
-                  name="email"
-                  required
-                  type="email"
-                  placeholder="hello@example.com"
-                  className="h-11 pl-9 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-slate-100 rounded-xl text-sm placeholder:text-slate-400
-                             focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-0
-                             focus-visible:border-blue-600 focus-visible:bg-white dark:focus-visible:bg-slate-900 transition-all"
-                />
+          <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/70 p-4 mb-5">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                <Lock className="w-4 h-4 text-blue-700 dark:text-blue-400" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-slate-900 dark:text-white">Password login</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Best for demos and shared access</p>
               </div>
             </div>
 
-            <div className="flex items-start gap-2.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/50 rounded-xl px-4 py-3">
-              <ShieldCheck className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-              <p className="text-blue-700 dark:text-blue-300 text-xs leading-relaxed">
-                We'll email you a secure magic link — no password required.
-              </p>
+            <form action={handleCredentialsLogin} className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                <Label className="text-slate-700 dark:text-slate-300 text-sm font-medium">
+                  Email address <span className="text-red-500">*</span>
+                </Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                  <Input
+                    name="email"
+                    required
+                    type="email"
+                    placeholder="hello@example.com"
+                    className="h-11 pl-9 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 dark:text-slate-100 rounded-xl text-sm placeholder:text-slate-400
+                               focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-0
+                               focus-visible:border-blue-600 focus-visible:bg-white dark:focus-visible:bg-slate-900 transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <Label className="text-slate-700 dark:text-slate-300 text-sm font-medium">
+                  Password <span className="text-red-500">*</span>
+                </Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                  <Input
+                    name="password"
+                    required
+                    type="password"
+                    placeholder="Enter your password"
+                    className="h-11 pl-9 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 dark:text-slate-100 rounded-xl text-sm placeholder:text-slate-400
+                               focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-0
+                               focus-visible:border-blue-600 focus-visible:bg-white dark:focus-visible:bg-slate-900 transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-blue-100 dark:border-blue-900/40 bg-blue-50/70 dark:bg-blue-900/20 px-3 py-2.5 text-xs text-blue-700 dark:text-blue-300">
+                Demo access: use <span className="font-semibold">demo@invoicepilot.com</span> with <span className="font-semibold">demo123456</span>.
+              </div>
+
+              <SubmitButton text="Sign in with password" />
+            </form>
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/60 p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                <Mail className="w-4 h-4 text-slate-700 dark:text-slate-300" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-slate-900 dark:text-white">Magic link</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">No password required</p>
+              </div>
             </div>
 
-            <SubmitButton text="Send magic link" />
-          </form>
+            <form action={handleMagicLinkLogin} className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                <Label className="text-slate-700 dark:text-slate-300 text-sm font-medium">
+                  Email address <span className="text-red-500">*</span>
+                </Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                  <Input
+                    name="email"
+                    required
+                    type="email"
+                    placeholder="hello@example.com"
+                    className="h-11 pl-9 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-slate-100 rounded-xl text-sm placeholder:text-slate-400
+                               focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-0
+                               focus-visible:border-blue-600 focus-visible:bg-white dark:focus-visible:bg-slate-900 transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/50 rounded-xl px-4 py-3">
+                <ShieldCheck className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                <p className="text-blue-700 dark:text-blue-300 text-xs leading-relaxed">
+                  We'll email you a secure magic link — no password required.
+                </p>
+              </div>
+
+              <SubmitButton text="Send magic link" />
+            </form>
+          </div>
 
           <DemoNotice />
 
