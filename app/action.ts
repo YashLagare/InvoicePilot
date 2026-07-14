@@ -77,10 +77,6 @@ export async function createInvoice(prevState: any, formData: FormData) {
 
     //send email after creation 
     try {
-        const baseUrl =
-            process.env.NODE_ENV !== "production"
-                ? "http://localhost:3000"
-                : `https://${process.env.VERCEL_URL ?? process.env.NEXT_PUBLIC_BASE_URL ?? "invoice-pilot-gold.vercel.app"}`;
         await emailClient.sendMail({
             from: process.env.EMAIL_FROM || 'InvoicePilot <hello@demomailtrap.com>',
             to: submission.value.clientEmail,
@@ -95,7 +91,7 @@ export async function createInvoice(prevState: any, formData: FormData) {
                     currency: submission.value.currency,
                 }).format(submission.value.total),
                 dueDate: Number(submission.value.dueDate) === 0 ? "Due on Receipt" : `Net ${submission.value.dueDate}`,
-                invoiceLink: `${baseUrl}/api/invoice/${data.id}`
+                invoiceLink: `https://invoice-pilot-gold.vercel.app/api/invoice/${data.id}`
             })
         });
     } catch (error) {
@@ -151,10 +147,6 @@ export async function editInvoice(prevState: any, formData: FormData) {
     const sender = process.env.EMAIL_FROM || 'InvoicePilot <hello@demomailtrap.com>';
 
     try {
-        const baseUrl =
-            process.env.NODE_ENV !== "production"
-                ? "http://localhost:3000"
-                : `https://${process.env.VERCEL_URL ?? process.env.NEXT_PUBLIC_BASE_URL ?? "invoice-pilot-gold.vercel.app"}`;
         await emailClient.sendMail({
             from: sender,
             to: submission.value.clientEmail,
@@ -169,7 +161,7 @@ export async function editInvoice(prevState: any, formData: FormData) {
                     currency: submission.value.currency,
                 }).format(submission.value.total),
                 dueDate: Number(submission.value.dueDate) === 0 ? "Due on Receipt" : `Net ${submission.value.dueDate}`,
-                invoiceLink: `${baseUrl}/api/invoice/${data.id}`
+                invoiceLink: `https://invoice-pilot-gold.vercel.app/api/invoice/${data.id}`
             })
         });
     } catch (error) {
