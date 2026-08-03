@@ -5,25 +5,29 @@ import { EmptyState } from "./EmptyState";
 import Graph from "./Graph";
 
 async function getInvoices(userId: string) {
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
     const rawData = await prisma.invoice.findMany({
         where: {
             status: "PAID",
             userId,
-            createdAt: {
-                lte: new Date(),
-                gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-            },
+            OR: [
+                { updatedAt: { gte: thirtyDaysAgo } },
+                { createdAt: { gte: thirtyDaysAgo } },
+            ],
         },
-        select: { createdAt: true, total: true },
-        orderBy: { createdAt: "asc" },
+        select: { createdAt: true, updatedAt: true, total: true, amountPaid: true },
+        orderBy: { updatedAt: "asc" },
     });
 
     const aggregateData = rawData.reduce((acc: { [key: string]: number }, curr) => {
-        const date = new Date(curr.createdAt).toLocaleDateString("en-US", {
+        const paymentDate = curr.updatedAt || curr.createdAt;
+        const date = new Date(paymentDate).toLocaleDateString("en-US", {
             month: "short",
             day: "numeric",
         });
-        acc[date] = (acc[date] || 0) + curr.total;
+        const amount = curr.amountPaid && curr.amountPaid > 0 ? curr.amountPaid : curr.total;
+        acc[date] = (acc[date] || 0) + amount;
         return acc;
     }, {});
 
@@ -42,7 +46,7 @@ const InvoiceGraph = async () => {
             <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-slate-100 dark:border-slate-800">
                 <div>
                     <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Revenue Overview</h3>
-                    <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">Paid invoices in the last 30 days</p>
+                    <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">Paid invoices & Stripe online revenue in the last 30 days</p>
                 </div>
                 <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-900/50 flex items-center justify-center">
                     <TrendingUp className="w-4 h-4 text-blue-700 dark:text-blue-400" />
