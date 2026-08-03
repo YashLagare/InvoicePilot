@@ -232,7 +232,7 @@ export async function createInvoice(prevState: any, formData: FormData) {
                     currency: submission.value.currency,
                 }).format(total),
                 dueDate: Number(submission.value.dueDate) === 0 ? "Due on Receipt" : `Net ${submission.value.dueDate}`,
-                invoiceLink: `${process.env.NEXTAUTH_URL || 'https://invoice-pilot-gold.vercel.app'}/pay/${data.publicToken}`
+                invoiceLink: `${process.env.NEXT_PUBLIC_BASE_URL ? (process.env.NEXT_PUBLIC_BASE_URL.startsWith('http') ? process.env.NEXT_PUBLIC_BASE_URL : `https://${process.env.NEXT_PUBLIC_BASE_URL}`) : (process.env.NEXTAUTH_URL && !process.env.NEXTAUTH_URL.includes('localhost') ? process.env.NEXTAUTH_URL : 'https://invoice-pilot-gold.vercel.app')}/pay/${data.publicToken}`
             })
         });
 
@@ -336,7 +336,7 @@ export async function editInvoice(prevState: any, formData: FormData) {
                     currency: submission.value.currency,
                 }).format(total),
                 dueDate: Number(submission.value.dueDate) === 0 ? "Due on Receipt" : `Net ${submission.value.dueDate}`,
-                invoiceLink: `${process.env.NEXTAUTH_URL || 'https://invoice-pilot-gold.vercel.app'}/pay/${data.publicToken}`
+                invoiceLink: `${process.env.NEXT_PUBLIC_BASE_URL ? (process.env.NEXT_PUBLIC_BASE_URL.startsWith('http') ? process.env.NEXT_PUBLIC_BASE_URL : `https://${process.env.NEXT_PUBLIC_BASE_URL}`) : (process.env.NEXTAUTH_URL && !process.env.NEXTAUTH_URL.includes('localhost') ? process.env.NEXTAUTH_URL : 'https://invoice-pilot-gold.vercel.app')}/pay/${data.publicToken}`
             })
         });
     } catch (error) {

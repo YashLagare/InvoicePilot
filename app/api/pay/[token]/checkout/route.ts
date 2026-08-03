@@ -8,6 +8,7 @@ export async function POST(
 ) {
     try {
         const { token } = await params;
+        const origin = new URL(request.url).origin;
 
         const invoice = await prisma.invoice.findUnique({
             where: {
@@ -20,7 +21,7 @@ export async function POST(
         }
 
         if (invoice.status === "PAID") {
-            return NextResponse.redirect(`${process.env.NEXTAUTH_URL || "https://invoice-pilot-gold.vercel.app"}/pay/${token}`);
+            return NextResponse.redirect(`${origin}/pay/${token}`);
         }
 
         const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
@@ -43,7 +44,7 @@ export async function POST(
                 },
             });
 
-            return NextResponse.redirect(`${process.env.NEXTAUTH_URL || "http://localhost:3000"}/pay/${token}?paid=true`);
+            return NextResponse.redirect(`${origin}/pay/${token}?status=success`);
         }
 
         const stripe = new Stripe(stripeSecretKey, {
@@ -71,8 +72,8 @@ export async function POST(
                 invoiceId: invoice.id,
                 publicToken: invoice.publicToken as string,
             },
-            success_url: `${process.env.NEXTAUTH_URL || "http://localhost:3000"}/pay/${token}?paid=true&session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.NEXTAUTH_URL || "http://localhost:3000"}/pay/${token}?cancelled=true`,
+            success_url: `${origin}/pay/${token}?paid=true&session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${origin}/pay/${token}?cancelled=true`,
         });
 
         return NextResponse.redirect(session.url as string, 303);
