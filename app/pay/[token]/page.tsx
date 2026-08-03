@@ -6,7 +6,6 @@ import prisma from "@/lib/db";
 import { AlertCircle, CheckCircle2, CreditCard, Download, ShieldCheck, Sparkles } from "lucide-react";
 import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
-import { revalidatePath } from "next/cache";
 import Stripe from "stripe";
 import { emailClient } from "@/app/utils/mailtrap";
 
@@ -107,12 +106,6 @@ async function getPublicInvoiceAndReconcile(
             } catch (emailErr) {
                 console.error("Failed to send payment receipt email:", emailErr);
             }
-
-            // Revalidate cache paths
-            revalidatePath("/dashboard");
-            revalidatePath("/dashboard/invoices");
-            revalidatePath("/dashboard/clients");
-            revalidatePath(`/pay/${token}`);
 
             return updatedInvoice;
         }
