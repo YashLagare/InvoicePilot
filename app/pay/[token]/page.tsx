@@ -4,7 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { formatCurrency } from "@/app/utils/formatCurrency";
 import prisma from "@/lib/db";
 import { AlertCircle, CheckCircle2, CreditCard, Download, ShieldCheck, Sparkles } from "lucide-react";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { revalidatePath } from "next/cache";
 import Stripe from "stripe";
@@ -114,8 +114,7 @@ async function getPublicInvoiceAndReconcile(
             revalidatePath("/dashboard/clients");
             revalidatePath(`/pay/${token}`);
 
-            // Perform clean URL redirect so session_id query parameters are stripped
-            redirect(`/pay/${token}?status=success`);
+            return updatedInvoice;
         }
     }
 
