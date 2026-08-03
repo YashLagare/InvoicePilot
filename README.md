@@ -43,7 +43,8 @@ InvoicePilot/
 ```
 
 ### Project Cover Screenshot
-[INSERT_PROJECT_COVER_SCREENSHOT]
+<img width="1899" height="908" alt="image" src="https://github.com/user-attachments/assets/9f4aa1ed-7c0f-4384-ace7-d1f75d19782b" />
+
 
 ---
 
@@ -350,52 +351,72 @@ invoice-pilot/
 # 7 UI Screenshots
 
 ### Home Landing Page
-[INSERT_HOME_PAGE_SCREENSHOT]
+<img width="1900" height="909" alt="image" src="https://github.com/user-attachments/assets/7ab3870e-30c6-4368-9980-430b07a08e0d" />
+
 
 ### Authentication Login Page
-[INSERT_LOGIN_PAGE_SCREENSHOT]
+<img width="1368" height="924" alt="image" src="https://github.com/user-attachments/assets/0dc7e45e-f25b-4e3c-9c12-3cdc99c8d42d" />
+
 
 ### Magic Link Verification Page
-[INSERT_VERIFY_PAGE_SCREENSHOT]
+<img width="1157" height="790" alt="image" src="https://github.com/user-attachments/assets/4211aea2-8eff-4a91-8353-31e1bf973744" />
 
-### User Onboarding Page
-[INSERT_ONBOARDING_PAGE_SCREENSHOT]
 
 ### Executive Dashboard Page
-[INSERT_DASHBOARD_SCREENSHOT]
+<img width="1899" height="908" alt="image" src="https://github.com/user-attachments/assets/c4e9bf1e-e4b6-4cf2-8671-624cef395d22" />
+
 
 ### Client Directory List Page
-[INSERT_CLIENTS_LIST_SCREENSHOT]
+<img width="1919" height="909" alt="image" src="https://github.com/user-attachments/assets/58d065f4-55e1-4e7f-bd3e-6c28124e95ec" />
+
 
 ### Create Client Profile Page
-[INSERT_CREATE_CLIENT_SCREENSHOT]
+<img width="641" height="693" alt="image" src="https://github.com/user-attachments/assets/b76aff6a-d397-44a3-8026-8b7e1dfe98c3" />
+
 
 ### Client Details & History Page
-[INSERT_CLIENT_DETAILS_SCREENSHOT]
+<img width="1919" height="909" alt="image" src="https://github.com/user-attachments/assets/26f8b73b-0fd2-4ae8-acbf-103ae49401e9" />
+
 
 ### Edit Client Profile Page
-[INSERT_EDIT_CLIENT_SCREENSHOT]
+<img width="711" height="744" alt="image" src="https://github.com/user-attachments/assets/741ae720-fb7b-4e82-bc32-94cb9a375cd0" />
+
 
 ### Invoice List Page
-[INSERT_INVOICES_LIST_SCREENSHOT]
+<img width="1900" height="904" alt="image" src="https://github.com/user-attachments/assets/5a145148-f853-470a-a798-307150716e55" />
+
 
 ### Create Invoice Page (Live Builder)
-[INSERT_CREATE_INVOICE_SCREENSHOT]
+<img width="1901" height="907" alt="image" src="https://github.com/user-attachments/assets/cf97cad4-1516-4cfa-930d-ce6f260238c7" />
+
 
 ### Edit Invoice Page
-[INSERT_EDIT_INVOICE_SCREENSHOT]
+<img width="1899" height="893" alt="image" src="https://github.com/user-attachments/assets/c7a59919-c1f6-494d-b1d1-be2688884adc" />
+
 
 ### Delete Invoice Confirmation Page
-[INSERT_DELETE_INVOICE_SCREENSHOT]
+<img width="861" height="747" alt="image" src="https://github.com/user-attachments/assets/4b277f39-1f9c-4c0d-971b-ff87b7f9d0f0" />
+
 
 ### Mark Invoice as Paid Page
-[INSERT_MARK_PAID_INVOICE_SCREENSHOT]
+<img width="768" height="746" alt="image" src="https://github.com/user-attachments/assets/12c84b3e-dfed-4bbb-8bb3-6901501b46e9" />
+
 
 ### Company Settings & Branding Page
-[INSERT_SETTINGS_PAGE_SCREENSHOT]
+<img width="1093" height="793" alt="image" src="https://github.com/user-attachments/assets/754a8140-9802-4470-8e83-b734e0b29327" />
 
-### Public Client Portal Page
-[INSERT_PUBLIC_CLIENT_PORTAL_SCREENSHOT]
+
+### Client Page
+<img width="1919" height="907" alt="image" src="https://github.com/user-attachments/assets/4c2d2ad7-ec41-4075-87c8-901605a0a262" />
+
+<img width="1900" height="910" alt="image" src="https://github.com/user-attachments/assets/214cad10-606b-4ef5-91b1-bdb260b28335" />
+
+<img width="1915" height="906" alt="image" src="https://github.com/user-attachments/assets/7f779090-38f7-460a-b090-c6b21a5247f1" />
+
+<img width="1919" height="910" alt="image" src="https://github.com/user-attachments/assets/e28ab66b-82f9-4a09-8ba1-cd5e42f3b16a" />
+
+
+
 
 ---
 
