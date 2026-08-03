@@ -1,4 +1,4 @@
-import { FileText, Heart } from "lucide-react";
+import { FileText } from "lucide-react";
 import Link from "next/link";
 
 export default function Footer() {
@@ -31,29 +31,26 @@ export default function Footer() {
           </div>
 
           <div>
-            <p className="text-xs font-bold text-foreground uppercase tracking-wider mb-3">Resources</p>
+            <p className="text-xs font-bold text-foreground uppercase tracking-wider mb-3">Contact Us</p>
             <ul className="space-y-2 text-xs text-muted-foreground">
-              <li><Link href="/login" className="hover:text-primary transition-colors">Sign In</Link></li>
-              <li><Link href="/dashboard" className="hover:text-primary transition-colors">Dashboard</Link></li>
-              <li><a href="https://github.com" target="_blank" rel="noreferrer" className="hover:text-primary transition-colors">GitHub Repository</a></li>
+              <li><Link href="mailto:yashlagare77@gmail.com" className="hover:text-primary transition-colors">Email</Link></li>
+              <li><Link href="https://portfolio-five-opal-53.vercel.app/" target="_blank" rel="noreferrer" className="hover:text-primary transition-colors">Portfolio</Link></li>
+              <li><Link href="https://github.com/YashLagare" target="_blank" rel="noreferrer" className="hover:text-primary transition-colors">GitHub</Link></li>
             </ul>
           </div>
 
           <div>
             <p className="text-xs font-bold text-foreground uppercase tracking-wider mb-3">Legal & Security</p>
             <ul className="space-y-2 text-xs text-muted-foreground">
-              <li><span className="hover:text-primary transition-colors cursor-pointer">Privacy Policy</span></li>
-              <li><span className="hover:text-primary transition-colors cursor-pointer">Terms of Service</span></li>
-              <li><span className="hover:text-primary transition-colors cursor-pointer">Stripe Security</span></li>
+              <li><Link href="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link></li>
+              <li><Link href="/terms" className="hover:text-primary transition-colors">Terms of Service</Link></li>
+              <li><Link href="/stripe-security" className="hover:text-primary transition-colors">Stripe Security</Link></li>
             </ul>
           </div>
         </div>
 
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
           <p>&copy; {new Date().getFullYear()} InvoicePilot. All rights reserved.</p>
-          <p className="flex items-center gap-1">
-            Built with <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500" /> Next.js 16, TypeScript & Stripe
-          </p>
         </div>
       </div>
     </footer>
