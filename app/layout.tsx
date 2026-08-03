@@ -14,8 +14,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "InvoicePilot",
-  description: "Modern invoice software for freelancers & SMBs",
+  title: "InvoicePilot - Modern Invoicing & Payments",
+  description: "Create professional invoices, get paid online via Stripe, and manage clients — all from one modern dashboard.",
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
