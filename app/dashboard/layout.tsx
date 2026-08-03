@@ -12,9 +12,13 @@ import { signOut } from "../utils/auth";
 import { requireUser } from "../utils/hooks";
 import { ModeToggle } from "../components/ModeToggle";
 
-async function getUser(userId: string) {
-    const data = await prisma.user.findUnique({
-        where: { id: userId },
+async function getUser(userId: string, email?: string) {
+    if (!userId && !email) {
+        redirect("/login");
+    }
+
+    const data = await prisma.user.findFirst({
+        where: userId ? { id: userId } : { email: email },
         select: {
             id: true,
             firstName: true,
@@ -31,7 +35,7 @@ async function getUser(userId: string) {
 
 const DashboardLayout = async ({ children }: { children: ReactNode }) => {
     const session = await requireUser();
-    const data = await getUser(session.user?.id as string);
+    const data = await getUser(session.user?.id as string, session.user?.email as string);
 
     return (
         <>
@@ -113,6 +117,12 @@ const DashboardLayout = async ({ children }: { children: ReactNode }) => {
                         </div>
 
                         <div className="flex items-center gap-5 ml-auto">
+                            {session.user?.email === "demo@invoicepilot.app" && (
+                                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 text-xs font-bold">
+                                    <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                                    <span>Demo Workspace</span>
+                                </div>
+                            )}
                             <ModeToggle />
                             
                             <div className="flex items-center gap-3">

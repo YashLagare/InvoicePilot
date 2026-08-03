@@ -1,68 +1,76 @@
 import prisma from "@/lib/db";
-import { ActivitySquare, CreditCard, IndianRupee, Users } from "lucide-react";
+import { ActivitySquare, CreditCard, DollarSign, Users } from "lucide-react";
 import { formatCurrency } from "../utils/formatCurrency";
 import { requireUser } from "../utils/hooks";
 
 async function getData(userId: string) {
-  const [data, openInvoices, paidInvoices] = await Promise.all([
+  const [invoices, clients, companyProfile] = await Promise.all([
     prisma.invoice.findMany({
       where: { userId },
-      select: { total: true },
+      select: { total: true, status: true, amountPaid: true, balance: true, currency: true },
     }),
-    prisma.invoice.findMany({
-      where: { userId, status: "PENDING" },
-      select: { id: true },
+    prisma.client.count({
+      where: { userId },
     }),
-    prisma.invoice.findMany({
-      where: { userId, status: "PAID" },
-      select: { id: true },
+    prisma.companyProfile.findUnique({
+      where: { userId },
+      select: { defaultCurrency: true },
     }),
   ]);
-  return { data, openInvoices, paidInvoices };
+  return { invoices, clients, currency: companyProfile?.defaultCurrency || "USD" };
 }
 
 const DashboardBlocks = async () => {
   const session = await requireUser();
-  const { data, openInvoices, paidInvoices } = await getData(session.user?.id as string);
+  const { invoices, clients, currency } = await getData(session.user?.id as string);
 
-  const totalRevenue = data.reduce((acc, invoice) => acc + invoice.total, 0);
+  const totalCollected = invoices
+    .filter((inv) => inv.status === "PAID")
+    .reduce((acc, inv) => acc + (inv.amountPaid || inv.total), 0);
+
+  const totalOutstanding = invoices
+    .filter((inv) => inv.status === "PENDING" || inv.status === "SENT" || inv.status === "OVERDUE")
+    .reduce((acc, inv) => acc + (inv.balance || inv.total), 0);
+
+  const paidCount = invoices.filter((inv) => inv.status === "PAID").length;
+  const openCount = invoices.filter((inv) => inv.status !== "PAID" && inv.status !== "CANCELLED").length;
 
   const blocks = [
     {
-      title: "Total Revenue",
-      value: formatCurrency({ amount: totalRevenue, currency: "INR" }),
-      sub: "Based on all invoices",
-      icon: IndianRupee,
-      iconBg: "bg-blue-50 dark:bg-blue-900/50",
-      iconColor: "text-blue-700 dark:text-blue-400",
-      accent: "border-l-4 border-l-blue-700 dark:border-l-blue-500",
-    },
-    {
-      title: "Total Invoices",
-      value: `+${data.length}`,
-      sub: "Invoices issued in total",
-      icon: Users,
-      iconBg: "bg-violet-50 dark:bg-violet-900/50",
-      iconColor: "text-violet-700 dark:text-violet-400",
-      accent: "border-l-4 border-l-violet-500 dark:border-l-violet-400",
-    },
-    {
-      title: "Paid Invoices",
-      value: `${paidInvoices.length}`,
-      sub: "Successfully collected",
-      icon: CreditCard,
+      title: "Collected Revenue",
+      value: formatCurrency({ amount: totalCollected, currency }),
+      sub: `${paidCount} settled invoices`,
+      icon: DollarSign,
       iconBg: "bg-emerald-50 dark:bg-emerald-900/50",
       iconColor: "text-emerald-700 dark:text-emerald-400",
-      accent: "border-l-4 border-l-emerald-500 dark:border-l-emerald-400",
+      accent: "border-l-4 border-l-emerald-600 dark:border-l-emerald-500",
     },
     {
-      title: "Open Invoices",
-      value: `+${openInvoices.length}`,
-      sub: "Awaiting payment",
+      title: "Pending Receivables",
+      value: formatCurrency({ amount: totalOutstanding, currency }),
+      sub: `${openCount} unpaid invoices`,
       icon: ActivitySquare,
       iconBg: "bg-amber-50 dark:bg-amber-900/50",
       iconColor: "text-amber-700 dark:text-amber-400",
       accent: "border-l-4 border-l-amber-500 dark:border-l-amber-400",
+    },
+    {
+      title: "Active Clients",
+      value: `${clients}`,
+      sub: "Saved client profiles",
+      icon: Users,
+      iconBg: "bg-blue-50 dark:bg-blue-900/50",
+      iconColor: "text-blue-700 dark:text-blue-400",
+      accent: "border-l-4 border-l-blue-600 dark:border-l-blue-500",
+    },
+    {
+      title: "Total Invoices",
+      value: `${invoices.length}`,
+      sub: "Total invoices generated",
+      icon: CreditCard,
+      iconBg: "bg-violet-50 dark:bg-violet-900/50",
+      iconColor: "text-violet-700 dark:text-violet-400",
+      accent: "border-l-4 border-l-violet-500 dark:border-l-violet-400",
     },
   ];
 

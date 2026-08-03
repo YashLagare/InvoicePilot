@@ -1,1129 +1,806 @@
-# InvoicePilot — Project Documentation
+# InvoicePilot — Enterprise SaaS Invoicing Platform
 
-## Project Name
-InvoicePilot
+## Cover Page
 
-### Project Description
-InvoicePilot is a Next.js (App Router) web application that lets authenticated users create invoices with line items, manage invoice status (PENDING/PAID), generate invoice PDFs, and send invoice-related emails (new invoice, updated invoice, and payment reminders).
+**Project Name:** InvoicePilot  
+**Project Description:** InvoicePilot is a modern full-stack Next.js (App Router) enterprise SaaS application designed for freelancers, SMBs, and modern teams. It enables users to create professional invoices with live split-screen visual previews, manage client directories, configure business branding and bank payout details, issue tokenized public client portals, collect online credit card payments via Stripe Checkout, and track complete financial analytics and activity audit trails.  
+**Business Problem Solved:** Eliminates administrative overhead, manual PDF formatting errors, fragmented client tracking, and delayed payment processing by centralizing client management, automated tax/discount calculations, tokenized invoice sharing, and automated online payment settlement.  
+**Target Users:** Freelancers, Independent Contractors, Small Businesses, Agencies, and Modern Service Teams.  
+**Business Value:** Accelerates invoice delivery, reduces payment cycles via online Stripe Checkout, automates payment status tracking, and provides real-time visibility into revenue metrics and receivables.  
+**Current Version:** 0.1.0  
+**Last Updated:** August 3, 2026  
 
-### Business Problem Solved
-Freelancers and SMBs often need a fast way to:
-- create invoices with multiple line items,
-- keep track of paid vs pending invoices,
-- download/share invoices as PDFs,
-- notify clients by email when invoices are created/updated and to send reminders.
-
-### Target Users
-- Freelancers
-- Small businesses
-- Teams that need lightweight invoicing and email delivery
-
-### Key Benefits
-- Magic-link authentication (email-only) via NextAuth
-- Invoice creation/editing with validated form inputs (Zod + Conform)
-- PDF generation using `jspdf`
-- Automated email delivery via Nodemailer transport
-- Dashboard overview (summary blocks, recent invoices, revenue chart for paid invoices)
-
-<img width="1901" height="912" alt="Screenshot 2026-06-21 123607" src="https://github.com/user-attachments/assets/dc9bbacf-0e51-4cd5-bf72-debb74a57fb8" />
-
-
----
-
-# 1. EXECUTIVE SUMMARY
-
-## Project Purpose
-Provide an invoicing dashboard that supports invoice lifecycle management (create, edit, download, delete, mark as paid) and automated email communication.
-
-## Core Features
-- Authentication using NextAuth with a Nodemailer provider (magic link)
-- Onboarding to capture user profile details (first/last name, address)
-- Create invoice with:
-  - invoice meta (name, number, currency)
-  - “From” (seller details) and “To” (client details)
-  - invoice date and payment terms (due date offset)
-  - line items (description, quantity, rate)
-  - optional note
-- Edit invoice (updates invoice + items)
-- Delete invoice
-- Mark invoice as PAID
-- Download invoice as a PDF via API
-- Send reminder emails via API
-
-## Technology Summary
-- **Frontend/Fullstack:** Next.js (App Router) + React + TypeScript
-- **Backend/data:** NextAuth + Prisma + PostgreSQL
-- **PDF generation:** `jspdf`
-- **Email:** Nodemailer transport (credentials configured via environment variables)
-- **UI:** Tailwind CSS + shadcn/ui components
-
-## Architecture Overview
-This is a fullstack Next.js application where:
-- UI routes are implemented as Next.js pages under `app/`.
-- Server-side operations are handled via:
-  - Next.js Route Handlers under `app/api/**` (for PDF generation and reminder email)
-  - Next.js Server Actions in `app/action.ts` (for onboarding and invoice CRUD/paid updates)
-- Database access is performed with Prisma Client (custom PrismaPg adapter + pg Pool).
-
-Architecture diagram:
-
+### Repository Structure Summary
 ```text
-User
-  │
-  ▼
-Next.js Frontend (App Router)
-  │
-  │  (Server Actions)
-  ▼
-Next.js Server (Route Handlers + Actions)
-  │
-  ▼
-Prisma Client
-  │
-  ▼
-PostgreSQL
+InvoicePilot/
+├── app/
+│   ├── api/
+│   │   ├── auth/[...nextauth]/
+│   │   ├── email/[invoiceId]/
+│   │   ├── invoice/[invoiceId]/
+│   │   ├── pay/[token]/checkout/
+│   │   ├── public/invoice/[token]/
+│   │   └── webhooks/stripe/
+│   ├── components/
+│   ├── dashboard/
+│   │   ├── clients/
+│   │   ├── invoices/
+│   │   └── settings/
+│   ├── login/
+│   ├── onboarding/
+│   ├── pay/[token]/
+│   ├── utils/
+│   └── verify/
+├── components/
+│   ├── landing/
+│   └── ui/
+├── lib/
+│   ├── generated/prisma/
+│   ├── db.ts
+│   └── utils.ts
+└── prisma/
+    └── schema.prisma
 ```
 
-## Business Value
-- Reduces manual invoice creation and follow-up work.
-- Improves invoice delivery through automated email templates.
-- Provides visibility into invoice status and paid revenue trends.
+### Project Cover Screenshot
+[INSERT_PROJECT_COVER_SCREENSHOT]
 
 ---
 
-# 2. PROJECT OVERVIEW
-
-## Project Name
-InvoicePilot
-
-## Objective
-Enable authenticated users to generate and manage invoices end-to-end, including PDF downloads and email notifications.
-
-## Scope
-Implemented features (based on source code):
-- Home page + login + verify page
-- Dashboard with statistical blocks, invoice list, invoice graph (paid invoices last 30 days), and recent invoices
-- Invoice CRUD operations plus status updates
-- PDF generation and reminder emails via API routes
-
-Out of scope / not implemented (explicitly):
-- No REST API for general invoice listing/search; listing is done in server components.
-- No payment processor integration (e.g., Stripe) is implemented.
-- No admin roles/permissions system is implemented.
-
-## Main Functionalities
-- Magic-link login (email only)
-- Onboarding form updating user profile fields
-- Create invoice (validated form)
-- Edit invoice (replace items)
-- Delete invoice
-- Mark invoice as paid
-- Generate PDF for an invoice
-- Send reminder email for an invoice
-
-## Business Use Case
-A freelancer generates invoices with multiple line items, delivers them to clients (via email templates), then later marks them paid and sends reminders.
-
-## Target Audience
-Freelancers and SMBs using invoicing workflows requiring PDF and email delivery.
+## Table of Contents
+- [1 Executive Summary](#1-executive-summary)
+- [2 Project Overview](#2-project-overview)
+- [3 Technology Stack](#3-technology-stack)
+- [4 System Architecture](#4-system-architecture)
+- [5 Repository Structure](#5-repository-structure)
+- [6 Features](#6-features)
+- [7 UI Screenshots](#7-ui-screenshots)
+- [8 Database Design](#8-database-design)
+- [9 Entity Relationship Diagram](#9-entity-relationship-diagram)
+- [10 Security](#10-security)
+- [11 Authentication](#11-authentication)
+- [12 API Documentation](#12-api-documentation)
+- [13 Third-party Services](#13-third-party-services)
+- [14 Environment Variables](#14-environment-variables)
+- [15 Major Dependencies](#15-major-dependencies)
+- [16 Installation Guide](#16-installation-guide)
+- [17 Deployment](#17-deployment)
+- [18 Request Lifecycle](#18-request-lifecycle)
+- [19 Performance](#19-performance)
+- [20 Security Review](#20-security-review)
+- [21 Challenges & Engineering Decisions](#21-challenges--engineering-decisions)
+- [22 Future Improvements](#22-future-improvements)
+- [23 Developer Notes](#23-developer-notes)
 
 ---
 
-# 3. TECHNOLOGY STACK
+# 1 Executive Summary
 
-## Frontend
-- **Framework:** Next.js (App Router)
-- **Language:** TypeScript
-- **UI Layer:** React Server Components and Client Components (mixed)
-- **Styling:** Tailwind CSS
-- **UI Component Library:** shadcn/ui (`components/ui/*`)
-- **Form Handling:** Conform (`@conform-to/react`, `@conform-to/zod`) + Zod
-- **Charts:** `recharts` (used for revenue overview graph)
-- **Client Notifications:** `sonner` (toasts)
+### Purpose
+InvoicePilot provides a full-stack, secure invoicing platform that covers the complete lifecycle of client billing: client record management, business profile branding, live visual invoice creation, automated calculations, tokenized public sharing, online Stripe payment collection, and revenue analytics.
 
-## Backend
-- **Runtime:** Next.js server (Route Handlers + Server Actions)
-- **Auth Framework:** NextAuth v5 beta
-- **Email Delivery:** Nodemailer (via NextAuth Nodemailer provider and direct Nodemailer transport for invoice emails)
-- **PDF Generation:** `jspdf`
+### Key Capabilities
+- Passwordless magic link authentication via NextAuth v5 and Nodemailer.
+- Client directory management with detailed payment histories and saved contact details.
+- Business profile settings including logo branding, tax/VAT numbers, currency defaults, and bank payout instructions.
+- Advanced invoice builder with side-by-side live visual PDF preview rendering.
+- Interactive tax %, discount %, and shipping fee calculation engine.
+- Responsive public client portal (`/pay/[token]`) with tokenized PDF downloads.
+- Stripe Checkout integration with automated webhook handlers (`checkout.session.completed`).
+- Event audit logging (`InvoiceActivity`) tracking invoice creation, edits, client views, reminders, and payment settlements.
 
-## Database
-- **Database Type:** PostgreSQL
-- **ORM/Access Layer:** Prisma Client
-- **Storage Strategy:**
-  - Invoice data and invoice items stored in relational tables as defined by Prisma schema.
-  - Authentication data stored using NextAuth PrismaAdapter models (User/Account/Session/VerificationToken/Authenticator).
+### Technology Summary
+- **Frontend & App Framework:** Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS, shadcn/ui.
+- **Backend Architecture:** Server Actions (`app/action.ts`), Next.js Route Handlers (`app/api/**`).
+- **Database & Data Layer:** PostgreSQL (Neon DB), Prisma ORM (`@prisma/client` with `@prisma/adapter-pg`).
+- **Authentication:** NextAuth v5 (Auth.js) with Nodemailer magic link provider.
+- **Payments & Webhooks:** Stripe Node SDK (`stripe`) with Checkout Sessions and Webhook listeners.
+- **PDF Engine:** Server-side `jspdf` buffer generator.
 
-## Authentication
-Implemented via:
-- **NextAuth** (`next-auth`) using **PrismaAdapter** with a Prisma-backed session store
-- **Provider:** `next-auth/providers/nodemailer` (magic link)
+### Architecture Summary
+InvoicePilot follows Next.js App Router architecture leveraging React Server Components (RSC) for data fetching, Server Actions for mutations, Route Handlers for PDF generation and webhook processing, and Prisma ORM for type-safe database queries.
 
-## DevOps & Deployment
-- Build/run scripts are standard Next.js scripts:
-  - `npm run dev`, `npm run build`, `npm run start`
-- Prisma runtime uses `DATABASE_URL` and Prisma PG adapter.
-- Actual hosting/CI/CD services are not implemented/configured in the repository (not found in inspected files).
+### Business Value
+Reduces operational friction, prevents manual calculation mistakes, ensures fast online payment collection, and provides clear visibility over cash flow and pending receivables.
 
 ---
 
-# 4. FEATURES LIST
+# 2 Project Overview
 
-> Note: Only features present in the codebase are documented.
+### Objective
+To equip freelancers, SMBs, and service providers with an automated, brandable invoicing application featuring live visual document previews, client profile management, public sharing portals, and integrated online card payments.
 
-1. **Magic-link email authentication**
-   - **Purpose:** Authenticate users without passwords using email magic links.
-   - **User Benefit:** Quick sign-in workflow.
-   - **Related Components:**
-     - `app/api/auth/[...nextauth]/route.ts`
-     - `app/utils/auth.ts`
-     - `app/login/page.tsx`
-     - `app/verify/page.tsx`
+### Scope
+- User onboarding and magic-link authentication.
+- Client directory management (Create, Read, Update, Delete).
+- Company profile & branding settings (Logo, Tax ID, Currency, Bank Payout Details).
+- Advanced invoice creation and editing with real-time live preview and tax math.
+- Public client landing page (`/pay/[token]`) for viewing invoices and paying online via Stripe.
+- Private and tokenized PDF buffer generation via Route Handlers.
+- Automated email delivery for invoice notifications, payment reminders, and receipts.
+- Financial analytics dashboard with Collected Revenue, Pending Receivables, Active Clients, and Total Invoices.
 
-2. **User onboarding profile update**
-   - **Purpose:** Capture additional user information (first name, last name, address).
-   - **User Benefit:** Pre-fills “From” details when creating invoices.
-   - **Related Components:** `app/action.ts` (server action `onboardingUser`)
+### Primary Modules
+1. **Authentication Module:** Passwordless sign-in and session verification.
+2. **Client Management Module:** Centralized client directory and billing records.
+3. **Company Settings Module:** Business branding, default currencies, and bank details.
+4. **Invoice Engine Module:** Live preview builder, tax/discount calculation, and PDF generation.
+5. **Client Portal & Payments Module:** Public tokenized web page and Stripe Checkout integration.
+6. **Analytics & Activity Module:** Revenue statistics, payment tracking, and audit logging.
 
-3. **Invoice creation with validated input**
-   - **Purpose:** Create an invoice and its invoice items.
-   - **User Benefit:** Ensures invoice data correctness and reduces manual entry errors.
-   - **Related Components:**
-     - `app/components/CreateInvoice.tsx`
-     - `app/utils/zodSchemas.ts` (invoiceSchema)
-     - `app/action.ts` (server action `createInvoice`)
+### Target Audience
+Freelancers, consultants, digital agencies, small business owners, and service providers.
 
-4. **Invoice editing**
-   - **Purpose:** Update invoice meta and replace invoice items.
-   - **User Benefit:** Maintain up-to-date invoice data.
-   - **Related Components:**
-     - `app/dashboard/invoices/[invoiceId]/page.tsx`
-     - `app/components/EditInvoice.tsx`
-     - `app/action.ts` (server action `editInvoice`)
-
-5. **Invoice deletion**
-   - **Purpose:** Permanently remove an invoice for the authenticated user.
-   - **User Benefit:** Cleanly remove incorrect invoices.
-   - **Related Components:**
-     - `app/dashboard/invoices/[invoiceId]/delete/page.tsx`
-     - `app/action.ts` (server action `DeleteInvoice`)
-
-6. **Mark invoice as paid**
-   - **Purpose:** Change invoice status to `PAID`.
-   - **User Benefit:** Track payment progress.
-   - **Related Components:**
-     - `app/dashboard/invoices/[invoiceId]/paid/page.tsx`
-     - `app/action.ts` (server action `MarkAsPaidInvoice`)
-
-7. **PDF generation for invoices**
-   - **Purpose:** Generate a PDF from invoice data.
-   - **User Benefit:** Download/share invoices.
-   - **Related Components:** `app/api/invoice/[invoiceId]/route.ts`
-
-8. **Reminder email delivery**
-   - **Purpose:** Send a reminder email containing invoice summary and a download link.
-   - **User Benefit:** Follow-up automatically.
-   - **Related Components:**
-     - `app/api/email/[invoiceId]/route.ts`
-     - `app/utils/emailTemplate.ts` (reminder template)
-     - `app/components/InvoiceActions.tsx`
-
-9. **Dashboard statistical overview**
-   - **Purpose:** Show revenue/invoice counts based on database queries.
-   - **User Benefit:** Quick status visibility.
-   - **Related Components:** `app/components/DashboardBlocks.tsx`
-
-10. **Revenue chart for paid invoices (last 30 days)**
-   - **Purpose:** Visualize aggregated paid invoice totals over the last 30 days.
-   - **User Benefit:** Identify payment trends.
-   - **Related Components:** `app/components/InvoiceGraph.tsx`, `app/components/Graph.tsx`
-
-11. **Invoice listing with status filter and pagination**
-   - **Purpose:** List invoices for the authenticated user with filtering by status and pagination.
-   - **User Benefit:** Manage many invoices efficiently.
-   - **Related Components:**
-     - `app/dashboard/invoices/page.tsx`
-     - `app/components/StatusFilter.tsx`
-     - `app/components/InvoiceList.tsx`
-     - `app/components/PaginationComponent.tsx`
-
-Feature Screenshot Placeholder:
+### Real-world Use Cases
+- A freelance designer creates an invoice, selects a saved client, applies a 10% tax rate, previews the invoice live, and emails a tokenized payment link.
+- A client opens the public portal link, reviews the itemized breakdown, downloads the PDF, and pays instantly using a credit card via Stripe Checkout.
+- The platform receives a Stripe webhook event, updates the invoice status to `PAID`, records transaction metadata, logs an activity event, and sends an automated payment receipt.
 
 ---
 
-# 5. FOLDER STRUCTURE
+# 3 Technology Stack
 
-Actual folder structure (as present in the repository):
+### Frontend
+| Technology | Version | Purpose |
+| :--- | :--- | :--- |
+| **Next.js** | `16.2.9` | React framework providing App Router, RSC, and server-side rendering |
+| **React** | `19.2.4` | UI component library |
+| **TypeScript** | `^5` | Type-safe JavaScript superset |
+| **Tailwind CSS** | `^4` | Utility-first CSS framework |
+| **shadcn/ui** | `^4.11.0` | Accessible component library built on Radix UI |
+| **Radix UI** | `^1.5.0` | Low-level primitive UI components |
+| **Lucide React** | `^1.17.0` | Icon set |
+| **Recharts** | `^3.8.0` | Data visualization library for dashboard graphs |
+| **Sonner** | `^2.0.7` | Toast notification system |
+| **Conform** | `^1.19.4` | Progressive enhancement form validation for React & Server Actions |
+
+### Backend
+| Technology | Version | Purpose |
+| :--- | :--- | :--- |
+| **Next.js Server** | `16.2.9` | Runtime environment for Route Handlers and Server Actions |
+| **NextAuth.js** | `^5.0.0-beta.31` | Passwordless authentication framework |
+| **Nodemailer** | `^7.0.13` | SMTP transport library for magic links, invoice delivery, and receipts |
+| **jsPDF** | `^4.2.1` | Programmatic PDF buffer generation engine |
+| **Stripe Node SDK** | `^18.0.0` | Server-side Stripe API client for Checkout Sessions and Webhooks |
+| **Zod** | `^3.23.8` | Schema validation library |
+
+### Database & ORM
+| Technology | Version | Purpose |
+| :--- | :--- | :--- |
+| **PostgreSQL** | Neon DB | Relational database engine |
+| **Prisma ORM** | `^7.8.0` | Database Object-Relational Mapping |
+| **@prisma/adapter-pg** | `^7.8.0` | Driver adapter for PostgreSQL pool connection |
+| **pg** | `^8.21.0` | PostgreSQL client pool driver |
+
+### Authentication
+| Technology | Version | Purpose |
+| :--- | :--- | :--- |
+| **@auth/prisma-adapter** | `^2.11.2` | NextAuth database adapter for Prisma |
+| **Nodemailer Provider** | NextAuth | Email magic-link authentication provider |
+
+---
+
+# 4 System Architecture
+
+InvoicePilot is built as a full-stack Next.js application using App Router patterns. All data mutations are executed via Next.js Server Actions, while file downloads and webhook callbacks use dedicated HTTP Route Handlers.
+
+```text
++------------------------------------------------------------------------------------+
+|                                  CLIENT BROWSER                                    |
+|  +---------------------------+  +--------------------------+  +-----------------+  |
+|  | Dashboard App (/dashboard)|  | Public Portal (/pay/token)|  | Landing (/page) |  |
+|  +-------------+-------------+  +------------+-------------+  +--------+--------+  |
++----------------|-----------------------------|-------------------------|-----------+
+                 |                             |                         |
+                 | (Server Actions / HTTPS)    | (Stripe Checkout)       |
+                 v                             v                         |
++------------------------------------------------------------------------|-----------+
+|                                NEXT.JS SERVER                          |           |
+|  +-------------------------+  +-------------------------+              |           |
+|  |  Server Actions         |  | Route Handlers          |              |           |
+|  |  - createInvoice        |  | - /api/invoice/[id]     | ◄------------+           |
+|  |  - editInvoice          |  | - /api/public/invoice/* |                          |
+|  |  - createClientAction   |  | - /api/pay/*/checkout   |                          |
+|  |  - updateCompanyProfile |  | - /api/webhooks/stripe  | ◄--- (Stripe Webhook)    |
+|  +------------+------------+  +------------+------------+                          |
+|               |                            |                                       |
+|               v                            v                                       |
+|  +------------------------------------------------------+                          |
+|  |               Prisma ORM & PostgreSQL                |                          |
+|  +------------------------------------------------------+                          |
++------------------------------------------------------------------------------------+
+```
+
+---
+
+# 5 Repository Structure
 
 ```text
 invoice-pilot/
 ├── app/
+│   ├── action.ts                          # Server Actions for Invoice, Client, and Settings mutations
 │   ├── api/
-│   │   ├── auth/[...nextauth]/
-│   │   │   └── route.ts
-│   │   ├── email/[invoiceId]/
-│   │   │   └── route.ts
-│   │   └── invoice/[invoiceId]/
-│   │       └── route.ts
-│   ├── components/
+│   │   ├── auth/[...nextauth]/route.ts    # NextAuth authentication endpoints
+│   │   ├── email/[invoiceId]/route.ts     # Payment reminder email trigger API
+│   │   ├── invoice/[invoiceId]/route.ts   # Private session-authenticated PDF API
+│   │   ├── pay/[token]/checkout/route.ts  # Stripe Checkout Session initialization API
+│   │   ├── public/invoice/[token]/route.ts# Tokenized public client PDF download API
+│   │   └── webhooks/stripe/route.ts       # Stripe webhook listener
+│   ├── components/                        # Dashboard & form feature components
 │   │   ├── CreateInvoice.tsx
 │   │   ├── DashboardBlocks.tsx
 │   │   ├── DashboardLinks.tsx
 │   │   ├── EditInvoice.tsx
-│   │   ├── EmptyState.tsx
-│   │   ├── Graph.tsx
 │   │   ├── InvoiceActions.tsx
 │   │   ├── InvoiceGraph.tsx
 │   │   ├── InvoiceItemList.tsx
 │   │   ├── InvoiceList.tsx
-│   │   ├── ModeToggle.tsx
-│   │   ├── PaginationComponent.tsx
-│   │   ├── RecentInvoices.tsx
-│   │   ├── StatusFilter.tsx
-│   │   ├── SubmitButton.tsx
-│   │   └── theme-provider.tsx
-│   ├── dashboard/
+│   │   └── ModeToggle.tsx
+│   ├── dashboard/                         # Dashboard page routes
+│   │   ├── clients/                       # Client management module
+│   │   ├── invoices/                      # Invoice management module
+│   │   ├── settings/                      # Business profile & settings module
 │   │   ├── layout.tsx
-│   │   ├── page.tsx
-│   │   └── invoices/
-│   │       ├── page.tsx
-│   │       ├── [invoiceId]/
-│   │       │   ├── page.tsx
-│   │       │   ├── delete/page.tsx
-│   │       │   └── paid/page.tsx
-│   │       └── create/page.tsx
-│   ├── login/page.tsx
-│   ├── onboarding/page.tsx
-│   ├── page.tsx
-│   └── verify/page.tsx
-├── components/
-│   └── ui/
-│       ├── avatar.tsx
-│       ├── badge.tsx
-│       ├── button.tsx
-│       ├── calendar.tsx
-│       ├── card.tsx
-│       ├── chart.tsx
-│       ├── dropdown-menu.tsx
-│       ├── input.tsx
-│       ├── label.tsx
-│       ├── popover.tsx
-│       ├── select.tsx
-│       ├── sheet.tsx
-│       ├── skeleton.tsx
-│       ├── sonner.tsx
-│       ├── table.tsx
-│       ├── textarea.tsx
-│       └── ...
+│   │   └── page.tsx
+│   ├── login/page.tsx                     # Authentication login page
+│   ├── onboarding/page.tsx                # User onboarding page
+│   ├── pay/[token]/page.tsx               # Public client landing page
+│   ├── utils/                             # Utility helpers (PDF generator, auth, schemas)
+│   │   ├── auth.ts
+│   │   ├── emailTemplate.ts
+│   │   ├── formatCurrency.ts
+│   │   ├── hooks.ts
+│   │   ├── pdfGenerator.ts
+│   │   └── zodSchemas.ts
+│   ├── verify/page.tsx                    # Magic-link verification page
+│   ├── globals.css                        # Global CSS styling & design tokens
+│   ├── layout.tsx                         # Root app layout
+│   └── page.tsx                           # Modular landing page composition
+├── components/                            # Global UI & Landing components
+│   ├── landing/                           # Modular landing page component suite
+│   │   ├── Comparison.tsx
+│   │   ├── CTA.tsx
+│   │   ├── FeatureGrid.tsx
+│   │   ├── Footer.tsx
+│   │   ├── Hero.tsx
+│   │   ├── Navbar.tsx
+│   │   ├── ProductPreview.tsx
+│   │   └── Workflow.tsx
+│   └── ui/                                # shadcn/ui primitives
 ├── lib/
-│   ├── db.ts
-│   └── utils.ts
+│   ├── db.ts                              # Prisma Client singleton initialization
+│   └── utils.ts                           # Tailwind class merging utility
 ├── prisma/
-│   └── schema.prisma
-├── public/
-│   ├── *.png, *.gif, *.webp, svg
-│   └── ...
-├── prisma.config.ts
-├── next.config.ts
-├── package.json
-├── tsconfig.json
-└── PROJECT_DOCUMENTATION.md (this file)
+│   ├── schema.prisma                      # Prisma database schema definition
+│   └── prisma.config.ts                   # Prisma configuration
+├── next.config.ts                         # Next.js configuration
+├── package.json                           # Dependency definitions and scripts
+└── tsconfig.json                          # TypeScript configuration
 ```
-
-Important top-level files:
-- `app/api/**`: Route handlers for auth, invoice PDF, and reminder emails.
-- `app/action.ts`: Server Actions for onboarding and invoice mutations.
-- `lib/db.ts`: Prisma client initialization (PostgreSQL via PrismaPg adapter).
-- `prisma/schema.prisma`: Database schema and relations.
 
 ---
 
-# 6. SYSTEM ARCHITECTURE
+# 6 Features
 
-Architecture pattern
-- Next.js App Router (hybrid server/client)
-- Server Actions for mutations
-- Route Handlers for PDF and email reminder endpoints
-- Prisma for database operations
-- NextAuth for authentication
+### 1. Passwordless Magic-Link Authentication
+- **Purpose:** Secure passwordless sign-in via email links.
+- **Business Value:** Eliminates password management vulnerabilities and provides seamless onboarding.
+- **Main Components:** `app/login/page.tsx`, `app/verify/page.tsx`, `app/utils/auth.ts`
+- **Related APIs:** `/api/auth/[...nextauth]`
+- **Dependencies:** `next-auth`, `@auth/prisma-adapter`, `nodemailer`
 
-Request lifecycle & data flow
+### 2. User Onboarding Module
+- **Purpose:** Captures initial user profile data (first name, last name, address).
+- **Business Value:** Pre-populates seller information on all created invoices.
+- **Main Components:** `app/onboarding/page.tsx`
+- **Related APIs:** Server Action `onboardingUser`
+- **Dependencies:** `@conform-to/react`, `zod`
 
-```text
-User Interaction (UI)
-   │
-   ├─(Server Action submit)───────────────┐
-   │                                       ▼
-   │                               Next.js Server Action
-   │                                       ▼
-   │                                  Prisma Client
-   │                                       ▼
-   │                               PostgreSQL / tables
-   │                                       ▼
-   │                                  Redirect/Response
-   │
-   └─(API call / route handler)────────────┐
-                                           ▼
-                                   Next.js Route Handler
-                                           ▼
-                                     Prisma Client
-                                           ▼
-                                  (Generate PDF / Send Email)
-                                           ▼
-                                      Response (JSON/PDF)
-```
+### 3. Saved Client Management Directory
+- **Purpose:** Full CRUD for client profiles (name, email, phone, company, billing address, tax ID, notes).
+- **Business Value:** Eliminates repetitive client data entry and provides client-level revenue metrics.
+- **Main Components:** `app/dashboard/clients/page.tsx`, `app/dashboard/clients/create/page.tsx`, `app/dashboard/clients/[clientId]/page.tsx`, `app/dashboard/clients/[clientId]/edit/page.tsx`
+- **Related APIs:** Server Actions (`createClientAction`, `editClientAction`, `deleteClientAction`)
+- **Dependencies:** `@prisma/client`, `@conform-to/react`, `zod`
 
-Communication model
-- Browser ↔ Next.js via:
-  - Server Actions (form submissions)
-  - Fetch to `/api/email/:invoiceId`
-  - Direct browser navigation to `/api/invoice/:invoiceId` for PDF
+### 4. Company Branding & Business Settings
+- **Purpose:** Configure business branding details (company logo URL, phone, website, tax/VAT ID, default currency, payment terms, bank transfer notes).
+- **Business Value:** Customizes invoices and client portals with business branding and bank payout instructions.
+- **Main Components:** `app/dashboard/settings/page.tsx`, `app/dashboard/settings/CompanySettingsForm.tsx`
+- **Related APIs:** Server Action `updateCompanyProfileAction`
+- **Dependencies:** `@prisma/client`, `zod`
+
+### 5. Advanced Invoice Builder with Live Visual Preview
+- **Purpose:** Create and edit invoices with saved client auto-fill, tax rate %, discount rate %, shipping fee calculations, custom invoice prefixes (`INV-101`), and real-time split-screen visual preview.
+- **Business Value:** Eliminates invoice calculation errors and allows instant visual verification before sending.
+- **Main Components:** `app/components/CreateInvoice.tsx`, `app/components/EditInvoice.tsx`, `app/components/InvoiceItemList.tsx`
+- **Related APIs:** Server Actions (`createInvoice`, `editInvoice`)
+- **Dependencies:** `@conform-to/react`, `zod`, `lucide-react`
+
+### 6. Public Client Portal & Tokenized Sharing
+- **Purpose:** Generates a public web page (`/pay/[token]`) for clients to view invoices, download PDFs, and pay online.
+- **Business Value:** Offers clients a frictionless, professional payment landing page accessible without registration.
+- **Main Components:** `app/pay/[token]/page.tsx`
+- **Related APIs:** `/api/public/invoice/[token]`, `/api/pay/[token]/checkout`
+- **Dependencies:** `@prisma/client`, `stripe`
+
+### 7. Online Stripe Checkout Payments & Webhooks
+- **Purpose:** Processes credit card payments online via Stripe Checkout Sessions and updates database status asynchronously via Webhooks.
+- **Business Value:** Speeds up payment collection and automates invoice reconciliation.
+- **Main Components:** `app/api/pay/[token]/checkout/route.ts`, `app/api/webhooks/stripe/route.ts`
+- **Related APIs:** `/api/pay/[token]/checkout`, `/api/webhooks/stripe`
+- **Dependencies:** `stripe`, `nodemailer`
+
+### 8. Programmatic PDF Generation Engine
+- **Purpose:** Generates PDF document buffers for private dashboard downloads and public client downloads.
+- **Business Value:** Delivers standardized PDF files matching business profile branding.
+- **Main Components:** `app/utils/pdfGenerator.ts`
+- **Related APIs:** `/api/invoice/[invoiceId]`, `/api/public/invoice/[token]`
+- **Dependencies:** `jspdf`
+
+### 9. Financial Analytics & Dashboard Overview
+- **Purpose:** Displays real-time KPI metrics for Collected Revenue, Pending Receivables, Active Clients, and Total Invoices alongside revenue charts.
+- **Business Value:** Provides immediate executive visibility over receivables and business cash flow.
+- **Main Components:** `app/components/DashboardBlocks.tsx`, `app/components/InvoiceGraph.tsx`, `app/components/RecentInvoices.tsx`
+- **Related APIs:** Direct RSC Prisma queries
+- **Dependencies:** `recharts`, `@prisma/client`
 
 ---
 
-# 7. DATABASE DESIGN
+# 7 UI Screenshots
 
-All database entities are defined in `prisma/schema.prisma`.
+### Home Landing Page
+[INSERT_HOME_PAGE_SCREENSHOT]
 
-## User
-- **Purpose:** Authenticated account profile used by NextAuth.
+### Authentication Login Page
+[INSERT_LOGIN_PAGE_SCREENSHOT]
+
+### Magic Link Verification Page
+[INSERT_VERIFY_PAGE_SCREENSHOT]
+
+### User Onboarding Page
+[INSERT_ONBOARDING_PAGE_SCREENSHOT]
+
+### Executive Dashboard Page
+[INSERT_DASHBOARD_SCREENSHOT]
+
+### Client Directory List Page
+[INSERT_CLIENTS_LIST_SCREENSHOT]
+
+### Create Client Profile Page
+[INSERT_CREATE_CLIENT_SCREENSHOT]
+
+### Client Details & History Page
+[INSERT_CLIENT_DETAILS_SCREENSHOT]
+
+### Edit Client Profile Page
+[INSERT_EDIT_CLIENT_SCREENSHOT]
+
+### Invoice List Page
+[INSERT_INVOICES_LIST_SCREENSHOT]
+
+### Create Invoice Page (Live Builder)
+[INSERT_CREATE_INVOICE_SCREENSHOT]
+
+### Edit Invoice Page
+[INSERT_EDIT_INVOICE_SCREENSHOT]
+
+### Delete Invoice Confirmation Page
+[INSERT_DELETE_INVOICE_SCREENSHOT]
+
+### Mark Invoice as Paid Page
+[INSERT_MARK_PAID_INVOICE_SCREENSHOT]
+
+### Company Settings & Branding Page
+[INSERT_SETTINGS_PAGE_SCREENSHOT]
+
+### Public Client Portal Page
+[INSERT_PUBLIC_CLIENT_PORTAL_SCREENSHOT]
+
+---
+
+# 8 Database Design
+
+### User Model
+- **Purpose:** Represents authenticated user accounts.
+- **Primary Key:** `id` (`String`, `cuid()`)
 - **Fields:**
-  - `id: String` (PK, default `cuid()`)
-  - `firstName?: String`
-  - `lastName?: String`
-  - `address?: String`
-  - `email: String` (unique)
-  - `emailVerified?: DateTime`
-  - `image?: String`
-  - Relations:
-    - `accounts: Account[]`
-    - `sessions: Session[]`
-    - `invoices: Invoice[]`
-    - `Authenticator[]` (WebAuthn optional)
-  - `createdAt: DateTime` (default now)
-  - `updatedAt: DateTime` (auto update)
+  - `firstName` (`String?`)
+  - `lastName` (`String?`)
+  - `address` (`String?`)
+  - `email` (`String`, `@unique`)
+  - `emailVerified` (`DateTime?`)
+  - `image` (`String?`)
+  - `createdAt` (`DateTime`, `@default(now())`)
+  - `updatedAt` (`DateTime`, `@updatedAt`)
+- **Relationships:** Has many `Invoice`, `Client`, and optional `CompanyProfile`.
 
-## Account
-- **Purpose:** NextAuth account linking model.
+### CompanyProfile Model
+- **Purpose:** Stores user business profile, branding, default currency, and bank transfer payout notes.
+- **Primary Key:** `id` (`String`, `cuid()`)
+- **Foreign Key:** `userId` (`String`, `@unique`, references `User.id`, `onDelete: Cascade`)
 - **Fields:**
-  - `userId: String` (FK to User)
-  - `type: String`
-  - `provider: String`
-  - `providerAccountId: String`
-  - Token fields (`refresh_token`, `access_token`, etc.)
-  - `createdAt`, `updatedAt`
-- **Constraints:** composite primary key `@@id([provider, providerAccountId])`
+  - `businessName` (`String?`)
+  - `logoUrl` (`String?`)
+  - `phone` (`String?`)
+  - `website` (`String?`)
+  - `taxId` (`String?`)
+  - `defaultCurrency` (`String`, `@default("USD")`)
+  - `paymentTerms` (`Int`, `@default(0)`)
+  - `bankDetails` (`String?`)
+  - `createdAt` (`DateTime`, `@default(now())`)
+  - `updatedAt` (`DateTime`, `@updatedAt`)
 
-## Session
-- **Purpose:** NextAuth session storage model.
+### Client Model
+- **Purpose:** Stores client contact details and billing addresses.
+- **Primary Key:** `id` (`String`, `uuid()`)
+- **Foreign Key:** `userId` (`String`, references `User.id`, `onDelete: Cascade`)
 - **Fields:**
-  - `sessionToken: String` (unique, PK)
-  - `userId: String` (FK to User)
-  - `expires: DateTime`
-  - `createdAt`, `updatedAt`
+  - `name` (`String`)
+  - `email` (`String`)
+  - `phone` (`String?`)
+  - `company` (`String?`)
+  - `address` (`String?`)
+  - `taxId` (`String?`)
+  - `notes` (`String?`)
+  - `createdAt` (`DateTime`, `@default(now())`)
+  - `updatedAt` (`DateTime`, `@updatedAt`)
+- **Relationships:** Belongs to `User`, has many `Invoice`.
 
-## VerificationToken
-- **Purpose:** NextAuth verification token storage.
+### Invoice Model
+- **Purpose:** Core invoice entity containing billing data, totals, calculations, and public tokens.
+- **Primary Key:** `id` (`String`, `uuid()`)
+- **Foreign Keys:**
+  - `userId` (`String?`, references `User.id`, `onDelete: SetNull`)
+  - `clientId` (`String?`, references `Client.id`, `onDelete: SetNull`)
 - **Fields:**
-  - `identifier: String`
-  - `token: String`
-  - `expires: DateTime`
-- **Constraints:** composite primary key `@@id([identifier, token])`
+  - `total` (`Float`, `@default(0)`)
+  - `subtotal` (`Float`, `@default(0)`)
+  - `taxRate` (`Float`, `@default(0)`)
+  - `taxAmount` (`Float`, `@default(0)`)
+  - `discountRate` (`Float`, `@default(0)`)
+  - `discountAmount` (`Float`, `@default(0)`)
+  - `shippingAmount` (`Float`, `@default(0)`)
+  - `amountPaid` (`Float`, `@default(0)`)
+  - `balance` (`Float`, `@default(0)`)
+  - `status` (`InvoiceStatus`, `@default(PENDING)`)
+  - `date` (`DateTime`)
+  - `dueDate` (`String`)
+  - `fromName` (`String`)
+  - `fromEmail` (`String`)
+  - `fromAddress` (`String`)
+  - `clientName` (`String`)
+  - `clientEmail` (`String`)
+  - `clientAddress` (`String`)
+  - `currency` (`String`)
+  - `invoiceName` (`String`)
+  - `invoiceNumber` (`Int`)
+  - `invoicePrefix` (`String`, `@default("INV")`)
+  - `note` (`String?`)
+  - `publicToken` (`String?`, `@unique`, `@default(uuid())`)
+  - `stripePaymentIntentId` (`String?`)
+  - `createdAt` (`DateTime`, `@default(now())`)
+  - `updatedAt` (`DateTime`, `@updatedAt`)
+- **Relationships:** Belongs to `User` and `Client`, has many `InvoiceItem` and `InvoiceActivity`.
 
-## Authenticator
-- **Purpose:** Optional WebAuthn model for NextAuth (present in schema but provider usage not implemented beyond schema support).
-- **Fields:** credential fields; relation to User.
-
-## Invoice
-- **Purpose:** Main business entity representing an invoice.
+### InvoiceItem Model
+- **Purpose:** Stores individual line items belonging to an invoice.
+- **Primary Key:** `id` (`String`, `uuid()`)
+- **Foreign Key:** `invoiceId` (`String`, references `Invoice.id`, `onDelete: Cascade`)
 - **Fields:**
-  - `id: String` (PK, default `uuid()`)
-  - `total: Int`
-  - `status: InvoiceStatus`
-  - `date: DateTime`
-  - `dueDate: String`
-  - `fromName: String`
-  - `fromEmail: String`
-  - `fromAddress: String`
-  - `clientName: String`
-  - `clientEmail: String`
-  - `clientAddress: String`
-  - `currency: String`
-  - `invoiceName: String`
-  - `invoiceNumber: Int`
-  - `note?: String`
-  - Relations:
-    - `items: InvoiceItem[]`
-    - `user?: User` via `userId?: String`
-  - `createdAt`, `updatedAt`
+  - `description` (`String`)
+  - `quantity` (`Float`, `@default(1)`)
+  - `rate` (`Float`, `@default(0)`)
+  - `amount` (`Float`, `@default(0)`)
 
-## InvoiceItem
-- **Purpose:** Line items within an invoice.
+### InvoiceActivity Model
+- **Purpose:** Audit trail log tracking invoice events.
+- **Primary Key:** `id` (`String`, `uuid()`)
+- **Foreign Key:** `invoiceId` (`String`, references `Invoice.id`, `onDelete: Cascade`)
 - **Fields:**
-  - `id: String` (PK, default `uuid()`)
-  - `description: String`
-  - `quantity: Int`
-  - `rate: Int`
-  - `invoiceId: String` (FK to Invoice)
-  - Relation: `invoice: Invoice` with cascade delete
-
-## InvoiceStatus enum
-- `PAID`
-- `PENDING`
+  - `type` (`String`) - `CREATED`, `UPDATED`, `SENT`, `VIEWED`, `PAID`
+  - `description` (`String`)
+  - `createdAt` (`DateTime`, `@default(now())`)
 
 ---
 
-# 8. ENTITY RELATIONSHIP DIAGRAM (ERD)
+# 9 Entity Relationship Diagram
 
 ```text
-User
- ├─ id (PK)
- ├─ email (unique)
- └─ invoices (1:N)
-
-     1:N
-     ▼
-Invoice
- ├─ id (PK)
- ├─ userId (FK -> User.id, optional)
- ├─ status (InvoiceStatus)
- └─ items (1:N)
-
-     1:N
-     ▼
-InvoiceItem
- ├─ id (PK)
- ├─ invoiceId (FK -> Invoice.id)
- └─ description, quantity, rate
++-------------------+       1        1       +-----------------------+
+| User              |------------------------| CompanyProfile        |
++-------------------+                        +-----------------------+
+| id (PK)           |                        | id (PK)               |
+| email (UQ)        |                        | userId (FK, UQ)       |
++-------------------+                        | defaultCurrency       |
+  |             |                            +-----------------------+
+  | 1           | 1
+  |             |
+  | N           | N
+  v             v
++-------------+ +--------------------+
+| Client      | | Invoice            |
++-------------+ +--------------------+
+| id (PK)     | | id (PK)            |
+| userId (FK) | | userId (FK)        |
+| name        | | clientId (FK)      |
+| email       | | publicToken (UQ)   |
++-------------+ | total, status      |
+                +--------------------+
+                  |               |
+                  | 1             | 1
+                  |               |
+                  | N             | N
+                  v               v
+                +---------------+ +-----------------------+
+                | InvoiceItem   | | InvoiceActivity       |
+                +---------------+ +-----------------------+
+                | id (PK)       | | id (PK)               |
+                | invoiceId(FK) | | invoiceId (FK)        |
+                | description   | | type, description     |
+                +---------------+ +-----------------------+
 ```
 
 ---
 
-# 9. SECURITY ARCHITECTURE
+# 10 Security
 
-Security architecture based on actual implementation in source code.
+### Implemented Security Mechanisms
+- **Authentication:** Passwordless email magic-link authentication powered by NextAuth v5.
+- **Protected Routes:** Dashboard layouts enforce user session authentication using `requireUser()` server helper.
+- **API Access Controls:** Route Handler `/api/invoice/[invoiceId]` verifies that the active session matches `invoice.userId`.
+- **Public Token Access:** Public client portals (`/pay/[token]`) and public PDF downloads (`/api/public/invoice/[token]`) rely on cryptographically random UUID tokens (`publicToken`), preventing unauthorized UUID enumeration.
+- **Input Validation:** Zod schema validation enforces strict constraints on Server Actions and form submissions.
+- **Stripe Webhook Signature Verification:** Webhook endpoints verify signatures via `stripe.webhooks.constructEvent()` using `STRIPE_WEBHOOK_SECRET`.
 
-## Authentication
-- Uses NextAuth (`next-auth`) with:
-  - Prisma adapter storing sessions.
-  - Nodemailer provider configured from environment variables.
+### Missing / Deferred Security Mechanisms
+- Rate limiting middleware (e.g. Upstash Redis rate limiter) is not currently implemented on public endpoints.
 
-## Authorization
-- The app uses an app-level helper `requireUser()`.
-- `requireUser()`:
-  - calls `auth()` to retrieve session.
-  - if `!session?.user`, redirects to `/`.
-- Invoice-level authorization is implemented by filtering queries with `userId` and `invoice.id`:
-  - Examples:
-    - `app/components/InvoiceList.tsx` uses `where: { userId }`.
-    - `app/dashboard/invoices/[invoiceId]/page.tsx` uses `findUnique({ where: { id: invoiceId, userId } })`.
-    - `app/dashboard/invoices/[invoiceId]/delete/page.tsx` checks invoice belongs to user.
-    - `app/dashboard/invoices/[invoiceId]/paid/page.tsx` checks invoice belongs to user.
-    - Reminder email endpoint finds invoice with `where: { id, userId }`.
+---
 
-## Session Management
-- Managed by NextAuth with Prisma session storage.
+# 11 Authentication
 
-## Token Strategy
-- NextAuth manages session tokens internally.
-- The repository does not expose direct JWT verification logic; it relies on NextAuth's `auth()`.
-
-## Protected Routes
-- Server-rendered dashboard and invoice pages call `requireUser()`.
-- API endpoints requiring invoice ownership call `requireUser()` too.
-
-## Validation
-- Zod schemas validate onboarding and invoice form data in server actions:
-  - `app/utils/zodSchemas.ts` uses `invoiceSchema` and `onboardingSchema`.
-
-## Encryption
-- Encryption specifics for tokens are not explicitly configured in code.
-- The app relies on NextAuth and its underlying secure mechanisms.
-
-Security diagram:
+### Authentication Flow
+InvoicePilot uses NextAuth v5 with a Nodemailer magic-link provider backed by PrismaAdapter.
 
 ```text
-User Request
-  │
-  ▼
-requireUser() / NextAuth auth()
-  │
-  ├─ if no session.user → redirect to '/'
-  │
-  └─ if session.user exists
-        │
-        ▼
-Invoice queries include userId constraint
-        │
-        ▼
-Proceed with mutation or data response
++--------+            +-------------------+            +--------------------+            +--------------+
+| User   |            | Login Page        |            | NextAuth Server    |            | SMTP Mailer  |
++---+----+            +---------+---------+            +---------+----------+            +------+-------+
+    |                           |                                |                              |
+    | Submit Email              |                                |                              |
+    +-------------------------->|                                |                              |
+    |                           | POST signin("nodemailer")      |                              |
+    |                           +------------------------------->|                              |
+    |                           |                                | Create VerificationToken     |
+    |                           |                                | Send Email Magic Link        |
+    |                           |                                +----------------------------->|
+    |                           |                                |                              |
+    | Click Link in Email       |                                |                              |
+    +----------------------------------------------------------->|                              |
+    |                           |                                | Validate Token               |
+    |                           |                                | Create Session Cookie        |
+    | Redirect to /dashboard    |<-------------------------------+                              |
+    |<--------------------------+                                |                              |
 ```
 
 ---
 
-# 10. AUTHENTICATION FLOW
+# 12 API Documentation
 
-Authentication is implemented using **NextAuth v5** with **Nodemailer magic link**.
+### Endpoint Summary Table
+| Method | Endpoint | Auth | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/auth/[...nextauth]` | No | NextAuth authentication handler |
+| `POST` | `/api/email/[invoiceId]` | Session | Sends invoice reminder email to client |
+| `GET` | `/api/invoice/[invoiceId]` | Session | Generates and streams PDF for authenticated user |
+| `GET` | `/api/public/invoice/[token]` | Token | Streams PDF for public client download via public token |
+| `POST` | `/api/pay/[token]/checkout` | Token | Creates a Stripe Checkout Session for public client payment |
+| `POST` | `/api/webhooks/stripe` | Signature | Processes Stripe `checkout.session.completed` events |
 
-```text
-User enters email on /login
-    │
-    ▼
-Login form submits to NextAuth signIn('nodemailer')
-    │
-    ▼
-NextAuth Nodemailer provider sends magic link email
-    │
-    ▼
-User opens magic link (NextAuth verify step)
-    │
-    ▼
-NextAuth creates/updates session (Prisma-backed)
-    │
-    ▼
-User redirected to /dashboard
-```
+### Endpoint Details
 
-Verified behavior in code:
-- Login page checks `session?.user` and redirects to `/dashboard`.
-- `/verify` route is a UI page that instructs user to check email (it does not implement token verification itself; verification is handled by NextAuth).
+#### 1. Private Invoice PDF Download
+- **Endpoint:** `GET /api/invoice/[invoiceId]`
+- **Authentication:** Required (Active NextAuth session matching `invoice.userId`)
+- **Response:** `200 OK` (`application/pdf` binary stream)
 
----
+#### 2. Public Invoice PDF Download
+- **Endpoint:** `GET /api/public/invoice/[token]`
+- **Authentication:** Public (Validated via `publicToken` UUID)
+- **Response:** `200 OK` (`application/pdf` binary stream)
 
-# 11. APPLICATION FLOW
+#### 3. Stripe Checkout Initialization
+- **Endpoint:** `POST /api/pay/[token]/checkout`
+- **Authentication:** Public (Validated via `publicToken` UUID)
+- **Response:** `303 See Other` (Redirect to Stripe Hosted Checkout URL)
 
-High-level app lifecycle and runtime flow.
-
-```text
-App Startup
-   │
-   ▼
-Load Next.js App Router Routes
-   │
-   ▼
-User visits:
-  - Home (/)
-  - Login (/login)
-  - Verify (/verify)
-  - Dashboard (/dashboard)
-   │
-   ▼
-Server components call requireUser() where required
-   │
-   ▼
-Render dashboard/list/forms
-   │
-   ▼
-User triggers actions:
-  - create/edit invoice (Server Action)
-  - send reminder email (POST to API route)
-  - download invoice PDF (GET to API route)
-   │
-   ▼
-Database update / email sending
-   │
-   ▼
-UI redirect or JSON response
-```
+#### 4. Stripe Webhook Listener
+- **Endpoint:** `POST /api/webhooks/stripe`
+- **Authentication:** Signature Verified (`stripe-signature` header)
+- **Response:** `200 OK` (`{ received: true }`)
 
 ---
 
-# 12. BACKEND INTERNAL FLOW
+# 13 Third-party Services
 
-Backend operations split into:
-- Route Handlers (PDF generation, reminder email)
-- Server Actions (onboarding, invoice CRUD)
-
-```text
-Client Request
-  │
-  ├─(Route Handler)→ Route Handler
-  │                  │
-  │                  ▼
-  │             requireUser() (for reminder)
-  │                  │
-  │                  ▼
-  │              Prisma query/update
-  │                  │
-  │                  ▼
-  │        PDF generation or Nodemailer send
-  │                  │
-  │                  ▼
-  │               Response (PDF/JSON)
-  │
-  └─(Server Action)→ Next.js Server Action
-                     │
-                     ▼
-               requireUser()
-                     │
-                     ▼
-            Conform/Zod validation
-                     │
-                     ▼
-              Prisma create/update/delete
-                     │
-                     ▼
-            Send email (create/edit only; reminders via API)
-                     │
-                     ▼
-                Redirect
-```
+- **NextAuth v5 (Auth.js):** Session management and passwordless email authentication.
+- **Stripe API:** Credit card payment processing via Hosted Checkout Sessions and Webhooks.
+- **Nodemailer / Mailtrap:** SMTP transport for delivery of magic links, invoice notifications, reminders, and payment receipts.
+- **Neon DB:** Managed serverless PostgreSQL database provider.
 
 ---
 
-# 13. FRONTEND INTERNAL FLOW
+# 14 Environment Variables
 
-```text
-Browser loads route
-   │
-   ▼
-Next.js Server Component renders page
-   │
-   ▼
-If page includes Client Components:
-   - forms
-   - filters
-   - invoice actions
-   - pagination
-   ▼
-User interacts with UI
-   │
-   ├─Form submission → Server Action
-   │
-   └─Reminder click → fetch POST /api/email/:invoiceId
-   │
-   ▼
-Re-render (via redirect for server actions, or client toast + implicit refresh)
-```
+| Variable | Required | Purpose |
+| :--- | :--- | :--- |
+| `DATABASE_URL` | Yes | PostgreSQL connection string |
+| `AUTH_SECRET` | Yes | Cryptographic secret for signing session tokens |
+| `EMAIL_SERVER_HOST` | Yes | SMTP server hostname |
+| `EMAIL_SERVER_PORT` | Yes | SMTP server port |
+| `EMAIL_SERVER_USER` | Yes | SMTP authentication user |
+| `EMAIL_SERVER_PASSWORD` | Yes | SMTP authentication password |
+| `EMAIL_FROM` | Yes | Default sender email address |
+| `MAILTRAP_TOKEN` | Yes | Mailtrap API token |
+| `NEXT_PUBLIC_BASE_URL` | Yes | Public application domain |
+| `NEXTAUTH_URL` | Yes | NextAuth canonical base URL |
+| `STRIPE_SECRET_KEY` | Optional | Stripe Secret API Key for online payments |
+| `STRIPE_WEBHOOK_SECRET` | Optional | Stripe Webhook Signing Secret |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Optional | Stripe Publishable API Key |
 
 ---
 
-# 14. API DOCUMENTATION
+# 15 Major Dependencies
 
-The repository defines the following API endpoints under `app/api/**`.
-
-> Note: The PDF download endpoint is a Route Handler returning a binary PDF.
-
-## Endpoint Summary
-
-| Method | Endpoint | Description | Auth Required |
-| ------ | -------- | ----------- | ------------- |
-| GET | `/api/invoice/:invoiceId` | Generates and returns an invoice PDF for the given invoiceId | **No explicit requireUser() in handler** (handler queries by id only; it does **not** filter by `userId`) |
-| POST | `/api/email/:invoiceId` | Sends reminder email for the given invoiceId | **Yes** (uses `requireUser()` and filters by userId) |
-
-## 1) Download Invoice PDF
-
-### Endpoint Name
-Download Invoice (PDF)
-
-- **Method:** `GET`
-- **Endpoint:** `/api/invoice/:invoiceId`
-- **Auth Required:** Not explicitly required by the implementation.
-- **Middleware Used:** None in this route.
-
-Request parameters
-
-| Type | Name | Example |
-| ---- | ---- | ------- |
-| URL Param | invoiceId | `uuid-string` |
-
-Request body
-- None (GET)
-
-Success response
-- `Content-Type: application/pdf`
-- `Content-Disposition: inline`
-- Response body: PDF binary
-
-Error response
-- `404` JSON: `{ "message": "Invoice not found" }`
-
-Internal flow
-
-```text
-GET /api/invoice/:invoiceId
-    │
-    ▼
-Prisma invoice.findUnique({ where: { id: invoiceId }, select: ... })
-    │
-    ▼
-If not found → NextResponse.json(404)
-    │
-    ▼
-Create jsPDF
-    │
-    ▼
-Return NextResponse(pdfBuffer, headers for PDF)
-```
-
-Security note (based on code):
-- This endpoint does **not** check `userId` ownership when fetching invoice.
-- Therefore, access control is not enforced at this specific route handler level.
-
-## 2) Send Reminder Email
-
-### Endpoint Name
-Send Invoice Reminder Email
-
-- **Method:** `POST`
-- **Endpoint:** `/api/email/:invoiceId`
-- **Auth Required:** Yes
-- **Middleware Used:** `requireUser()`
-
-Request parameters
-
-| Type | Name | Example |
-| ---- | ---- | ------- |
-| URL Param | invoiceId | `uuid-string` |
-
-Request body
-- Not used (handler reads only params)
-
-Success response
-- `200` JSON:
-
-```json
-{ "success": true, "message": "Reminder email sent successfully" }
-```
-
-Error responses
-- `404` JSON: `{ "error": "Invoice not found" }`
-- `500` JSON: `{ "error": "Failed to send reminder email" }`
-
-Internal flow
-
-```text
-POST /api/email/:invoiceId
-    │
-    ▼
-requireUser() → session.user
-    │
-    ▼
-Prisma invoice.findUnique({ where: { id: invoiceId, userId: session.user?.id } })
-    │
-    ▼
-If not found → 404
-    │
-    ▼
-Nodemailer emailClient.sendMail(reminder template)
-    │
-    ▼
-Return JSON success
-```
+- **`next` (`16.2.9`):** Core framework providing App Router, RSC, and server optimization.
+- **`@prisma/client` (`7.8.0`):** Type-safe ORM for database interaction.
+- **`stripe` (`^18.0.0`):** Official Node.js library for Stripe payment operations.
+- **`nodemailer` (`^7.0.13`):** SMTP transport engine.
+- **`jspdf` (`^4.2.1`):** Programmatic PDF generation engine.
+- **`zod` (`^3.23.8`):** Schema parsing and data validation.
+- **`@conform-to/react` (`^1.19.4`):** Form state management for Server Actions.
 
 ---
 
-# 15. THIRD-PARTY INTEGRATIONS
+# 16 Installation Guide
 
-## Email Delivery / Providers
-- **NextAuth Nodemailer Provider:** Used for magic link login.
-  - Configured via:
-    - `process.env.EMAIL_SERVER_HOST`
-    - `process.env.EMAIL_SERVER_PORT`
-    - `process.env.EMAIL_SERVER_USER`
-    - `process.env.EMAIL_SERVER_PASSWORD`
-    - `process.env.EMAIL_FROM`
-- **Nodemailer transport (`emailClient`)**: Used for sending invoice emails.
-  - File: `app/utils/mailtrap.ts`
+### Prerequisites
+- Node.js `^20.0.0` or higher
+- npm `^10.0.0`
+- PostgreSQL database instance (Neon DB recommended)
 
-Integration flow
+### Step-by-Step Setup
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/user/invoice-pilot.git
+   cd invoice-pilot
+   ```
 
-```text
-Invoice creation/edit (Server Action)
-    │
-    ▼
-Generate HTML template (app/utils/emailTemplate.ts)
-    │
-    ▼
-emailClient.sendMail(...) via Nodemailer transport
-    │
-    ▼
-Email sent to clientEmail
-```
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-## PDF Generation
-- `jspdf` is used server-side in `app/api/invoice/[invoiceId]/route.ts`.
+3. **Configure environment variables:**
+   Create a `.env` file in the root directory:
+   ```env
+   DATABASE_URL="postgresql://user:password@host/neondb?sslmode=require"
+   AUTH_SECRET="your-random-secret"
+   EMAIL_SERVER_HOST="smtp.mailtrap.io"
+   EMAIL_SERVER_PORT="587"
+   EMAIL_SERVER_USER="your-smtp-user"
+   EMAIL_SERVER_PASSWORD="your-smtp-password"
+   EMAIL_FROM="hello@example.com"
+   NEXTAUTH_URL="http://localhost:3000"
+   STRIPE_SECRET_KEY="sk_test_..."
+   STRIPE_WEBHOOK_SECRET="whsec_..."
+   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_test_..."
+   ```
 
-External payment integrations
-- None found in code.
+4. **Sync Database Schema:**
+   ```bash
+   npx prisma db push
+   npx prisma generate
+   ```
 
-External analytics
-- None found in code.
-
----
-
-# 16. ENVIRONMENT VARIABLES
-
-The repository uses environment variables referenced in source code. Values are not available because `.env` content cannot be read in this environment.
-
-| Variable | Purpose | Required |
-| -------- | ------- | -------- |
-| `DATABASE_URL` | PostgreSQL connection string used by Prisma | Yes (required; `lib/db.ts` throws if missing) |
-| `EMAIL_SERVER_HOST` | Nodemailer host (NextAuth provider + nodemailer transport) | Yes (used directly) |
-| `EMAIL_SERVER_PORT` | Nodemailer port (number) | Yes (typed as Number; port may be undefined for NextAuth provider) |
-| `EMAIL_SERVER_USER` | Nodemailer auth user | Yes (used by nodemailer auth) |
-| `EMAIL_SERVER_PASSWORD` | Nodemailer auth password | Yes |
-| `EMAIL_FROM` | From address used by email templates / senders | Optional (fallback used in code for some sends) |
-| `NODE_ENV` | Prisma client caching behavior | Not required but used |
-
-Environment variable usage notes (based on code):
-- `lib/db.ts` throws error if `DATABASE_URL` is not set.
-- Invoice emails attempt to use `process.env.EMAIL_FROM` with fallback:
-  - `'InvoicePilot <hello@demomailtrap.com>'`
-- Reminder endpoint also uses `process.env.EMAIL_FROM` with the same fallback.
-
-Environment variable example (keys only):
-
-```env
-DATABASE_URL=
-EMAIL_SERVER_HOST=
-EMAIL_SERVER_PORT=
-EMAIL_SERVER_USER=
-EMAIL_SERVER_PASSWORD=
-EMAIL_FROM=
-```
+5. **Run Development Server:**
+   ```bash
+   npm run dev
+   ```
+   Open `http://localhost:3000` in your browser.
 
 ---
 
-# 17. DEPENDENCIES
+# 17 Deployment
 
-## Frontend Dependencies (major)
-- `next` (Next.js)
-- `react`, `react-dom`
-- `tailwindcss` (via Tailwind toolchain)
-- `recharts` (charts)
-- `lucide-react` (icons)
-- `sonner` (toasts)
-- `jspdf` (PDF generation; used in server code)
+### Deployment Architecture
+- **Frontend & Server Actions:** Deployed on Vercel / Node.js container host.
+- **Database:** Hosted serverless PostgreSQL (Neon DB).
+- **Stripe Webhooks:** Configured pointing to `https://your-domain.com/api/webhooks/stripe`.
 
-## Backend Dependencies (major)
-- `next-auth` (authentication)
-- `@auth/prisma-adapter`, `@prisma/client` (Prisma integration)
-- `@prisma/adapter-pg`, `pg` (Postgres adapter)
-- `nodemailer` (email sending)
-- `zod`, `@conform-to/react`, `@conform-to/zod` (validation)
-
----
-
-# 18. INSTALLATION GUIDE
-
-1. Clone and enter project directory.
-
-```bash
-cd d:/MY-PROJECTS/InvoicePilot/invoice-pilot
-
-npm install
-
-# Prisma: ensure DATABASE_URL is set in your environment
-# Then generate the Prisma client
-npx prisma generate
-
-# Run the development server
-npm run dev
-```
-
----
-
-## 19. DEPLOYMENT GUIDE
-
-This project is a standard Next.js application.
-
-### Recommended deployment topology
-
-```text
-Browser
-  │
-  ▼
-Frontend Hosting (Next.js)
-  │
-  ▼
-API Routes + Server Actions
-  │
-  ▼
-PostgreSQL Database
-```
-
-### Steps
-1. Set required environment variables (see `#16`).
-2. Build the app:
-
+### Production Build Command
 ```bash
 npm run build
-```
-
-3. Start the server in production mode:
-
-```bash
 npm run start
 ```
 
-> Note: The repository does not include Docker/Kubernetes/CI pipelines; deployment is therefore handled externally by your chosen platform.
-
 ---
 
-## 20. RUNTIME FLOW
-
-What happens after the application starts.
+# 18 Request Lifecycle
 
 ```text
-Server Starts (Next.js)
-   │
-   ▼
-Route handlers & server actions become available
-   │
-   ▼
-User requests:
-  - /login
-  - /verify
-  - /dashboard
-  - /dashboard/invoices/*
-  - /api/invoice/* (PDF)
-  - /api/email/* (reminder)
-   │
-   ▼
-Authentication checks via NextAuth (auth/requireUser)
-   │
-   ▼
-Database queries/updates via Prisma
-   │
-   ▼
-PDF generation or email sending (where applicable)
-   │
-   ▼
-HTTP response / redirect
+User / Client
+      |
+      v
+Next.js App Router (app/page.tsx or app/dashboard/*)
+      |
+      +---> Server Component (RSC Direct Prisma Query)
+      |
+      +---> Server Action (app/action.ts)
+      |         |
+      |         v
+      |     Zod Validation & Auth Check (requireUser)
+      |         |
+      |         v
+      |     Prisma Transaction (PostgreSQL)
+      |         |
+      |         v
+      |     Email Dispatch (Nodemailer)
+      |
+      v
+HTTP Response / UI Revalidation
 ```
 
 ---
 
-## 21. CHALLENGES & LEARNINGS
+# 19 Performance
 
-### Technical Challenges (based on implementation)
-1. **Magic-link auth integration**
-   - Ensuring NextAuth Nodemailer provider, session storage, and app gating all work together.
-
-2. **Invoice item replacement during edit**
-   - The edit action uses `deleteMany: {}` followed by `create` of the provided items.
-
-3. **PDF generation formatting**
-   - The PDF layout is manually positioned; line wrapping uses `jsPDF.splitTextToSize`.
-
-4. **Email delivery reliability**
-   - Uses Nodemailer transport; send failures are caught and logged in create/edit actions.
-
-### Solutions Implemented
-- Prisma-backed authentication and session gating via `requireUser()`.
-- Zod validation for onboarding and invoice create/edit inputs.
-- Server-side PDF generation in a dedicated route handler.
-- Server actions for create/edit + direct API route for reminder emails.
-
-### Key Learnings
-- Keep invoice ownership constraints in all mutation and reminder flows.
-- Split responsibilities: server actions for CRUD, route handlers for binary/PDF and reminder emailing.
-
----
-
-## 22. COMMON ERRORS & TROUBLESHOOTING
-
-### Installation / Build
-- **Prisma error about DATABASE_URL**
-  - Fix: set `DATABASE_URL` in your environment.
-
-### Authentication
-- **Users can’t sign in / magic link not delivered**
-  - Fix: verify `EMAIL_SERVER_HOST`, `EMAIL_SERVER_PORT`, `EMAIL_SERVER_USER`, `EMAIL_SERVER_PASSWORD`, and `EMAIL_FROM`.
-
-- **Redirects to `/` instead of dashboard**
-  - Fix: ensure NextAuth session is established; confirm environment variables and database connectivity.
-
-### Database / Invoice operations
-- **Invoice not found (404)**
-  - Cause: invoice does not exist, or (for reminder) does not belong to the current user.
-
-### Email sending
-- **Reminder email fails (500)**
-  - Fix: verify nodemailer transport configuration and that invoice data exists for the current user.
-
----
-
-## 23. PERFORMANCE ANALYSIS
-
-### Current Optimizations
-- Server-side pagination for invoice list (fetches 10 invoices per page).
-- Prisma queries use `select` to limit returned columns.
+### Implemented Optimizations
+- React Server Components (RSC) fetch data on the server, eliminating client waterfall requests.
+- Selective Prisma `select` queries fetch only required fields.
+- Server-side pagination limits invoice queries to 10 items per page.
 
 ### Potential Bottlenecks
-- **PDF generation on demand**
-  - Each download regenerates PDF server-side.
-
-- **Email sending latency**
-  - Reminder emails are triggered via client fetch; network/email provider latency impacts UX.
+- Synchronous PDF buffer generation during GET requests for complex invoices.
 
 ### Scalability Considerations
-- Consider caching generated PDFs if download volume increases.
-- Consider queuing email jobs (not implemented in current repository).
-
-### Performance Recommendations
-- Add caching headers or pre-generation strategy for PDFs.
-- Introduce rate limiting for `/api/email/:invoiceId` (currently not present in inspected code).
+- Email sending can be offloaded to a background queue (e.g. Inngest / BullMQ) to reduce action execution latency.
 
 ---
 
-## 24. SECURITY REVIEW
+# 20 Security Review
 
-### Existing Security Measures
-- **Authentication gating**: `requireUser()` redirects unauthenticated users.
-- **Authorization by ownership** for invoice CRUD and reminders:
-  - list uses `where: { userId }`
-  - edit/delete/paid verify invoice belongs to `session.user?.id`
-  - reminder email endpoint queries with `{ id: invoiceId, userId: session.user?.id }`
-- **Input validation**: Zod schemas for onboarding/invoice create/edit.
-
-### Security Risks / Gaps (explicitly from implementation)
-- **PDF download authorization gap**
-  - `/api/invoice/[invoiceId]/route.ts` fetches the invoice by `id` only and does **not** enforce `userId` ownership.
-  - As a result, authenticated users are not required and invoice PDFs may be downloadable by guessing IDs.
+### Current Strengths
+- Passwordless magic link authentication eliminates credential theft.
+- User session isolation enforced on dashboard pages and server actions.
+- Cryptographic public tokens (`publicToken`) protect public invoice access.
+- Stripe signature verification prevents spoofed webhook payloads.
 
 ### Recommended Improvements
-1. Add authorization to the PDF route handler:
-   - enforce `requireUser()`
-   - query invoices by `{ id: invoiceId, userId: session.user?.id }`
-2. Add rate limiting to reminder endpoint.
-3. Validate and sanitize any email-related input (templates currently use provided fields directly).
-4. Add CSRF protections for any state-changing operations exposed to the browser (server actions already require form submission; reminder uses fetch).
+- Implement rate limiting middleware on `/api/pay/[token]/checkout` and authentication endpoints.
 
 ---
 
-## 25. FUTURE ENHANCEMENTS
+# 21 Challenges & Engineering Decisions
 
-Based strictly on current architecture and gaps:
-1. **Invoice PDF access control** (fix `/api/invoice/*` ownership).
-2. **Queued email delivery** (background job/queue), instead of synchronous sending.
-3. **Invoice number auto-increment per user** (currently stored as user input; no unique constraint enforced).
-4. **Improved due date handling**
-   - current dueDate field is stored as string and used as offset days in server action.
-5. **Search/sort** for invoices (currently status filter + pagination; full-text search not implemented).
-6. **Role-based access** (no admin/user roles implemented).
+- **App Router & Server Actions:** Selected Server Actions to handle forms natively with progressive enhancement via `@conform-to/react`.
+- **Tokenized Public Access:** Implemented dual PDF routes (`/api/invoice/[invoiceId]` for session users vs `/api/public/invoice/[token]` for clients) to balance data privacy with frictionless sharing.
 
 ---
 
-## 26. DEVELOPER NOTES
+# 22 Future Improvements
 
-### Architecture Decisions
-- Use Next.js App Router with Server Components and Server Actions for CRUD.
-- Use Route Handlers for endpoints that return non-HTML responses (PDF binary, reminder email JSON).
-- Use Prisma for data modeling and enforcement of relationships.
+- Automated recurring invoice generation (CRON schedules).
+- CSV/Excel accounting export for QuickBooks/Xero.
+- Multi-currency automatic exchange rate conversion.
 
-### Maintainability Notes
-- Consolidate email link generation:
-  - invoice create/edit actions use hardcoded `http://localhost:3000`.
-  - reminder endpoint also uses `http://localhost:3000`.
+---
 
-### Refactoring Opportunities
-- Remove duplication between `createInvoice` and `editInvoice` email template selection logic.
-- Standardize date types (`dueDate` is `String` in Prisma; consider `Int` for offset days if appropriate).
+# 23 Developer Notes
 
-### Technical Debt Observations
-- PDF endpoint lacks authorization checks.
-- Hardcoded base URL (`localhost:3000`) inside templates.
-- Reminder endpoint does not validate request body (it only uses params) and there is no rate limiting.
+- **Database Inspection:** Run `npx prisma studio` to inspect records visually at `http://localhost:5555`.
+- **Code Consistency:** All server actions enforce authentication via `requireUser()` in `app/utils/hooks.ts`.
 
+---
+Written by Yash Lagare

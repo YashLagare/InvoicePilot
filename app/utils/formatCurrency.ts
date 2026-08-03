@@ -1,11 +1,16 @@
 interface IFormatCurrencyOptions {
     amount: number;
-    currency: "INR" | "USD" | "EUR" | "GBP" | "CAD";
+    currency: string;
 }
 
 export function formatCurrency({amount, currency}: IFormatCurrencyOptions) {
-    return new Intl.NumberFormat("en-IN", {
-        style: "currency",
-        currency: currency,
-    }).format(amount);
+    try {
+        return new Intl.NumberFormat("en-US", {
+            style: "currency",
+            currency: currency || "USD",
+        }).format(amount);
+    } catch {
+        return `${currency || "$"} ${amount.toFixed(2)}`;
+    }
 }
+

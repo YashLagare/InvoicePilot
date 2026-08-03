@@ -1,10 +1,15 @@
-import prisma from "@/lib/db"
-import { PrismaAdapter } from "@auth/prisma-adapter"
-import NextAuth from "next-auth"
-import Nodemailer from "next-auth/providers/nodemailer"
+import prisma from "@/lib/db";
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import NextAuth from "next-auth";
+import Nodemailer from "next-auth/providers/nodemailer";
+import CredentialsProvider from "next-auth/providers/credentials";
+import { seedDemoUser } from "./demoSeed";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
     adapter: PrismaAdapter(prisma),
+    session: {
+        strategy: "jwt",
+    },
     providers: [
         Nodemailer({
             server: {
@@ -17,7 +22,35 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             },
             from: process.env.EMAIL_FROM,
         }),
+        CredentialsProvider({
+            id: "demo-login",
+            name: "Demo Account",
+            credentials: {},
+            async authorize() {
+                const demoUser = await seedDemoUser();
+                return {
+                    id: demoUser.id,
+                    email: demoUser.email,
+                    name: `${demoUser.firstName ?? "Demo"} ${demoUser.lastName ?? "User"}`.trim(),
+                };
+            },
+        }),
     ],
+
+    callbacks: {
+        async jwt({ token, user }) {
+            if (user) {
+                token.id = user.id;
+            }
+            return token;
+        },
+        async session({ session, token }) {
+            if (token && session.user) {
+                session.user.id = (token.id || token.sub) as string;
+            }
+            return session;
+        },
+    },
 
     pages: {
         verifyRequest: '/verify'

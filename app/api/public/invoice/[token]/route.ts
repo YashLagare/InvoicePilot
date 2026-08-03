@@ -1,4 +1,3 @@
-import { requireUser } from "@/app/utils/hooks";
 import { generateInvoicePDFBuffer } from "@/app/utils/pdfGenerator";
 import prisma from "@/lib/db";
 import { NextResponse } from "next/server";
@@ -8,17 +7,15 @@ export async function GET(
   {
     params,
   }: {
-    params: Promise<{ invoiceId: string }>;
+    params: Promise<{ token: string }>;
   },
 ) {
   try {
-    const session = await requireUser();
-    const { invoiceId } = await params;
+    const { token } = await params;
 
     const invoice = await prisma.invoice.findUnique({
       where: {
-        id: invoiceId,
-        userId: session.user?.id,
+        publicToken: token,
       },
       include: {
         items: true,
@@ -26,7 +23,7 @@ export async function GET(
     });
 
     if (!invoice) {
-      return NextResponse.json({ message: "Invoice not found or access denied" }, { status: 404 });
+      return NextResponse.json({ message: "Invoice not found" }, { status: 404 });
     }
 
     const pdfBuffer = generateInvoicePDFBuffer({
@@ -61,7 +58,7 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error("Failed to generate PDF:", error);
+    console.error("Failed to generate public PDF:", error);
     return NextResponse.json({ error: "Failed to generate PDF" }, { status: 500 });
   }
 }

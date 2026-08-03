@@ -25,6 +25,7 @@ async function getData(userId: string, page: number, status: string) {
                 createdAt: true,
                 status: true,
                 invoiceNumber: true,
+                invoicePrefix: true,
                 currency: true,
             },
             orderBy: { createdAt: "desc" },
@@ -109,7 +110,7 @@ export async function InvoiceList({ page, status = "ALL" }: { page: number; stat
                             >
                                 <TableCell className="pl-5 py-4">
                                     <span className="text-sm font-semibold text-blue-700 dark:text-blue-400">
-                                        #{invoice.invoiceNumber}
+                                        {invoice.invoicePrefix || 'INV'}-{invoice.invoiceNumber}
                                     </span>
                                 </TableCell>
                                 <TableCell className="py-4">

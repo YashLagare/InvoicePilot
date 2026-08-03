@@ -1,8 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
   output   = "../lib/generated/prisma"
@@ -22,10 +20,28 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
-  // Optional for WebAuthn support
   Authenticator Authenticator[]
-  //one to many relation
-  invoices      Invoice[]
+
+  invoices       Invoice[]
+  clients        Client[]
+  companyProfile CompanyProfile?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CompanyProfile {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  businessName    String?
+  logoUrl         String?
+  phone           String?
+  website         String?
+  taxId           String?
+  defaultCurrency String   @default("USD")
+  paymentTerms    Int      @default(0)
+  bankDetails     String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -70,7 +86,6 @@ model VerificationToken {
   @@id([identifier, token])
 }
 
-// Optional for WebAuthn support
 model Authenticator {
   credentialID         String  @unique
   userId               String
@@ -86,10 +101,45 @@ model Authenticator {
   @@id([userId, credentialID])
 }
 
+model Client {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  email     String
+  phone     String?
+  company   String?
+  address   String?
+  taxId     String?
+  notes     String?
+  invoices  Invoice[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum InvoiceStatus {
+  DRAFT
+  PENDING
+  SENT
+  PAID
+  OVERDUE
+  CANCELLED
+  PARTIALLY_PAID
+}
+
 model Invoice {
   id            String        @id @default(uuid())
-  total         Int
-  status        InvoiceStatus
+  total         Float         @default(0)
+  subtotal      Float         @default(0)
+  taxRate       Float         @default(0)
+  taxAmount     Float         @default(0)
+  discountRate  Float         @default(0)
+  discountAmount Float        @default(0)
+  shippingAmount Float        @default(0)
+  amountPaid    Float         @default(0)
+  balance       Float         @default(0)
+  status        InvoiceStatus @default(PENDING)
   date          DateTime
   dueDate       String
   fromName      String
@@ -101,9 +151,16 @@ model Invoice {
   currency      String
   invoiceName   String
   invoiceNumber Int
+  invoicePrefix String        @default("INV")
   note          String?
+  publicToken   String?       @unique @default(uuid())
+  stripePaymentIntentId String?
 
-  items InvoiceItem[]
+  clientId   String?
+  client     Client?          @relation(fields: [clientId], references: [id], onDelete: SetNull)
+
+  items      InvoiceItem[]
+  activities InvoiceActivity[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -111,16 +168,22 @@ model Invoice {
   userId    String?
 }
 
-enum InvoiceStatus {
-  PAID
-  PENDING
-}
-
 model InvoiceItem {
   id          String  @id @default(uuid())
   description String
-  quantity    Int
-  rate        Int
+  quantity    Float   @default(1)
+  rate        Float   @default(0)
+  amount      Float   @default(0)
   invoiceId   String
   invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
 }
+
+model InvoiceActivity {
+  id          String   @id @default(uuid())
+  invoiceId   String
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  type        String
+  description String
+  createdAt   DateTime @default(now())
+}
+
