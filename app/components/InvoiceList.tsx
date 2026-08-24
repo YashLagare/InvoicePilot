@@ -8,7 +8,7 @@ import PaginationComponent from "./PaginationComponent";
 
 async function getData(userId: string, page: number, status: string) {
     const pageSize = 10;
-    
+
     // Construct the where clause dynamically based on the status filter
     const whereClause: any = { userId };
     if (status && status !== "ALL") {

@@ -35,8 +35,8 @@ export default function StatusFilter() {
 
     return (
         <div className="flex items-center gap-2">
-            <Select 
-                value={selectedStatus} 
+            <Select
+                value={selectedStatus}
                 onValueChange={setSelectedStatus}
             >
                 <SelectTrigger className="w-[160px] h-10 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">

@@ -21,10 +21,10 @@ export default function PaginationComponent({ totalPages }: { totalPages: number
 
     return (
         <div className="flex items-center justify-end gap-2 mt-4">
-            <Button 
-                variant="outline" 
-                size="icon" 
-                disabled={currentPage <= 1} 
+            <Button
+                variant="outline"
+                size="icon"
+                disabled={currentPage <= 1}
                 onClick={() => router.push(createPageURL(currentPage - 1))}
             >
                 <ChevronLeft className="size-4" />
@@ -32,10 +32,10 @@ export default function PaginationComponent({ totalPages }: { totalPages: number
             <span className="text-sm font-medium">
                 Page {currentPage} of {totalPages}
             </span>
-            <Button 
-                variant="outline" 
-                size="icon" 
-                disabled={currentPage >= totalPages} 
+            <Button
+                variant="outline"
+                size="icon"
+                disabled={currentPage >= totalPages}
                 onClick={() => router.push(createPageURL(currentPage + 1))}
             >
                 <ChevronRight className="size-4" />
