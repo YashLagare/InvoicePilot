@@ -1,7 +1,5 @@
 # InvoicePilot — Enterprise SaaS Invoicing Platform
 
-## Cover Page
-
 **Project Name:** InvoicePilot  
 **Project Description:** InvoicePilot is a modern full-stack Next.js (App Router) enterprise SaaS application designed for freelancers, SMBs, and modern teams. It enables users to create professional invoices with live split-screen visual previews, manage client directories, configure business branding and bank payout details, issue tokenized public client portals, collect online credit card payments via Stripe Checkout, and track complete financial analytics and activity audit trails.  
 **Business Problem Solved:** Eliminates administrative overhead, manual PDF formatting errors, fragmented client tracking, and delayed payment processing by centralizing client management, automated tax/discount calculations, tokenized invoice sharing, and automated online payment settlement.  
