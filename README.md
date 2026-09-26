@@ -822,4 +822,4 @@ HTTP Response / UI Revalidation
 - **Code Consistency:** All server actions enforce authentication via `requireUser()` in `app/utils/hooks.ts`.
 
 ---
-Written by Yash Lagare
+Written by Yash Lagare.
